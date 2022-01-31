@@ -127,3 +127,20 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+### react ###
+.DS_*
+*.log
+frontend/logs
+**/*.backup.*
+**/*.back.*
+
+frontend/node_modules
+frontend/bower_components
+
+*.sublime*
+
+psd
+thumb
+sketch
