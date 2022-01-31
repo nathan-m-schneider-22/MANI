@@ -13,7 +13,6 @@ function App() {
         <CssBaseline />
         <Router>
           <Page className="geist" style={{ paddingTop: 0 }}>
-            <Page.Header style={{ height: "10vh" }}></Page.Header>
             <Switch>
               <Route exact path="/" component={LandingPage} />
               <Route path="/assistant" component={AssistantPage} />
