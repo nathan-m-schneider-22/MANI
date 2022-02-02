@@ -15,3 +15,6 @@ class VirtualAssistant:
         self.display_instance.display_loading()
         result = call_outsourced_API(input)
         return result
+
+    def teardown(self):
+        pass
