@@ -17,10 +17,18 @@ class MANI:
             result = self.virtual_assistant.get_result(input)
             self.display.display_result(result)
 
+    def teardown(self):
+        self.display.teardown()
+        self.interpreter.teardown()
+        self.virtual_assistant.teardown()
+
 
 def main():
     mani_instance = MANI()
-    mani_instance.main_loop()
+    try:
+        mani_instance.main_loop()
+    except:
+        mani_instance.teardown()
 
 
 if __name__ == "__main__":

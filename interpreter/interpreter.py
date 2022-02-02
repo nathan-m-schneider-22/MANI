@@ -35,3 +35,6 @@ class Interpreter:
             self.display_instance.display_state(input)
             time.sleep(1)
         return input
+
+    def teardown(self):
+        self.camera.teardown()
