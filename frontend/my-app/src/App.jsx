@@ -5,6 +5,7 @@ import AssistantPage from "./containers/assistantPage/AssistantPage";
 import LandingPage from "./containers/landingPage/LandingPage";
 import ShortcutsPage from "./containers/shortcutsPage/ShortcutsPage";
 import { GeistProvider, CssBaseline, Page } from "@geist-ui/react";
+import sseRecieverPage from "./containers/sseRecieverPage/sseRecieverPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
               <Route exact path="/" component={LandingPage} />
               <Route path="/assistant" component={AssistantPage} />
               <Route path="/shortcuts" component={ShortcutsPage} />
+              <Route path="/sse" component={sseRecieverPage} />
             </Switch>
           </Page>
         </Router>
