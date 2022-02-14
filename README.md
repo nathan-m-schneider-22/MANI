@@ -5,6 +5,10 @@ ASL Virtual Assistant for the Deaf
 # Development
 
 
+## Installing Packages
+
+`pip install opencv-python`
+
 ## Connecting to the Raspberry Pi
 Because the Dartmouth wifi networks use client isolation, connecting to the Pi from your laptop requires a direct ethernet connection (dongles available at the library circulation desk). 
 
