@@ -3,6 +3,7 @@ import os
 import getpass
 import cv2
 #import Letter Predictor model 
+from LetterPredictor import LetterPredictor
 
 #Dummy model selects random letter  - use real model later 
 def dummy_predict(image):
@@ -19,7 +20,7 @@ def make_directory(path):
         print("Directory "  + path + " already exists, will place images here...")
     
 
-def take_pic(path):
+def take_pic(path, model):
     num = 0
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
@@ -31,9 +32,10 @@ def take_pic(path):
         ret,frame = cap.read()
         cv2.imshow('frame',frame)
         k = cv2.waitKey(1)
-        image_path = path + "/image" + str(num) + ".jpeg"
-        cv2.imwrite(image_path, frame)
-        print(dummy_predict(image_path)) #pass to Letter Predictor model
+        #image_path = path + "/image" + str(num) + ".jpg"
+        #cv2.imwrite(image_path, frame)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        print(model.predict(frame)) #pass to Letter Predictor model
         num += 1
         #Hit escape to quit camera 
         if k%256 == 27:
@@ -50,6 +52,8 @@ getUser = getpass.getuser()
 path = "/Users/"  + getUser + "/Downloads/ManiImage"
 
 if __name__ == "__main__":
+    checkpoint_path = "./sample-asl-combodata.ckpt"
+    lp = LetterPredictor(checkpoint_path)
     make_directory(path)
-    take_pic(path)
+    take_pic(path, lp)
 
