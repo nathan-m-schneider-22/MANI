@@ -12,29 +12,29 @@ def dummy_predict(image):
     return rndlet[i]
 
 def make_directory(path):
-    os.mkdir(path) 
-    print("Made directory at "  + path)
+    if not os.path.isdir(path):
+        os.mkdir(path) 
+        print("Made directory at "  + path)
+    else:
+        print("Directory "  + path + " already exists, will place images here...")
     
 
 def take_pic(path):
+    num = 0
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         raise IOError("Cannot open webcam")
     else:
         print("opening camera")
         
-    while(True):
+    while(True): #continuous picture taking
         ret,frame = cap.read()
         cv2.imshow('frame',frame)
         k = cv2.waitKey(1)
-        
-        #Hit space when ready to capture image
-        if k%256 == 32:
-            print("Space hit, capturing image")
-            image_path = path + "/image.jpeg"
-            cv2.imwrite(image_path, frame)
-            print(dummy_predict(image_path)) #pass to Letter Predictor model
-            
+        image_path = path + "/image" + str(num) + ".jpeg"
+        cv2.imwrite(image_path, frame)
+        dummy_predict(image_path) #pass to Letter Predictor model
+        num += 1
         #Hit escape to quit camera 
         if k%256 == 27:
             print("Escape hit, closing...")
@@ -46,8 +46,8 @@ def take_pic(path):
 
 #----------------------------------------------
 
-
-path = "/Users/sarahkorb/Downloads/ManiImage" #edit this
+getUser = getpass.getuser()
+path = "/Users/"  + getUser + "/Downloads/ManiImage"
 
 if __name__ == "__main__":
     make_directory(path)
