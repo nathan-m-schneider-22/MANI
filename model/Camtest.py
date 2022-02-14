@@ -33,7 +33,7 @@ def take_pic(path):
         k = cv2.waitKey(1)
         image_path = path + "/image" + str(num) + ".jpeg"
         cv2.imwrite(image_path, frame)
-        dummy_predict(image_path) #pass to Letter Predictor model
+        print(dummy_predict(image_path)) #pass to Letter Predictor model
         num += 1
         #Hit escape to quit camera 
         if k%256 == 27:
