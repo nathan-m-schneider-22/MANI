@@ -33,7 +33,7 @@ def take_pic(path):
             print("Space hit, capturing image")
             image_path = path + "/image.jpeg"
             cv2.imwrite(image_path, frame)
-            dummy_predict(image_path) #pass to Letter Predictor model
+            print(dummy_predict(image_path)) #pass to Letter Predictor model
             
         #Hit escape to quit camera 
         if k%256 == 27:
