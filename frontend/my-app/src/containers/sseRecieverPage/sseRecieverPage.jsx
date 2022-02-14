@@ -1,11 +1,12 @@
 import React from 'react';
-
+import loading from './loading.gif'
 class sseRecieverPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       query: "",
-      response: ""
+      response: "",
+      loading:false
     };
     this.ws = new WebSocket("ws://127.0.0.1:5000/");
   }
@@ -19,14 +20,18 @@ class sseRecieverPage extends React.Component {
       const data = JSON.parse(event.data)
       console.log(data)
       if (data.type === "query"){
-        this.setState({query:data.content})
+        this.setState({query:data.content,loading:false})
       }
       if (data.type === "response"){
-        this.setState({response:data.content})
+        this.setState({response:data.content,loading:false})
       }
       if (data.type === "reset"){
-        this.setState({response:"",query:""})
+        this.setState({response:"",query:"",loading:false})
       }
+      if (data.type === "loading"){
+        this.setState({loading:true})
+      }
+
       this.setState({ currentData: JSON.parse(event.data) });
     };
 
@@ -38,7 +43,7 @@ class sseRecieverPage extends React.Component {
       <div className="App">
         <h1>{this.state.query}</h1>
         <h1>{this.state.response}</h1>
-
+        {this.state.loading && <img width={30} src={loading}></img>}
       </div>
     );
   }

@@ -37,6 +37,7 @@ class Display:
         if start_display:
             startup_command = "cd frontend/my-app/ && npm run start &"
             os.system(startup_command)
+            time.sleep(8)
         t = threading.Thread(target=start_loop)
         t.start()
 
@@ -56,6 +57,11 @@ class Display:
 
     # Display a loading screen while the outsourced VA is calling the API
     def display_loading(self):
+        data = {
+            "type": "loading",
+        }
+        message_queue.put(data)
+        message_queue.put(data)
         print("Displaying Loading")
 
     def display_reset(self):
