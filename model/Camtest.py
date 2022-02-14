@@ -2,9 +2,9 @@ import random
 import os
 import getpass
 import cv2
-#import Letter Predictor model 
+#import LetterPredictor
 
-#Dummy model selects random letter  - use real model later 
+#Dummy model selects random letter 
 def dummy_predict(image):
     #pass image to model 
     rndlet = ['A','B','C','D','E','F','G','H','I','J','K','M']
@@ -19,7 +19,12 @@ def make_directory(path):
         print("Directory "  + path + " already exists, will place images here...")
     
 
-def take_pic(path):
+def take_pic(path, model_path):
+#     test_transforms = transforms.Compose([
+#     transforms.ToPILImage(),
+#     transforms.Resize(size=(64,64)),
+#     transforms.ToTensor(),
+#     ])
     num = 0
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
@@ -31,10 +36,17 @@ def take_pic(path):
         ret,frame = cap.read()
         cv2.imshow('frame',frame)
         k = cv2.waitKey(1)
-        image_path = path + "/image" + str(num) + ".jpeg"
+        image_path = path + "/image" + str(num) + ".jpeg" #storing images 
         cv2.imwrite(image_path, frame)
-        print(dummy_predict(image_path)) #pass to Letter Predictor model
+        
+#Using Real model:
+#       image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#       lp = LetterPredictor(checkpoint_path, test_transforms)
+#       print(lp.predict(image))
+           
+        print(dummy_predict(image_path)) #Dummy model
         num += 1
+        
         #Hit escape to quit camera 
         if k%256 == 27:
             print("Escape hit, closing...")
