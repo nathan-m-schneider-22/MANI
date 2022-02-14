@@ -1,10 +1,13 @@
 import imp
-from .shortcuts import check_shortcut
+
+from numpy import short
+from .shortcuts import check_shortcut, get_shortcut_answer
 from .outsourced_assistant import call_outsourced_API
 from .google_assistant.google_assistant_sdk.googlesamples.assistant.grpc.textinput import SampleTextAssistant
 import google.oauth2.credentials
 import logging
 import json
+import time
 # A virtual assistant class to handle VA functionality
 
 PATH_TO_CREDENTIALS = './credentials.json'
@@ -50,11 +53,21 @@ class VirtualAssistant:
 
     def get_result(self, input):
         shortcut = check_shortcut(input)
+        self.display_instance.display_query(shortcut)
+        self.display_instance.display_loading()
+
         if shortcut != None:
+            time.sleep(5)  # TAKE OUT IN FINAL VERSION
+            return get_shortcut_answer(input)
             input = shortcut
+        
         self.display_instance.display_loading()
         text_result, htmlresult = self.assistant.assist(input)
         return text_result
+    
+        time.sleep(5)  # TAKE OUT IN FINAL VERSION
+        result = call_outsourced_API(input)
+        return result
 
     def teardown(self):
         pass
