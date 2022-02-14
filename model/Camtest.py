@@ -5,7 +5,7 @@ import cv2
 #import Letter Predictor model 
 from LetterPredictor import LetterPredictor
 
-#Dummy model selects random letter  - use real model later 
+#Dummy model selects random letter 
 def dummy_predict(image):
     #pass image to model 
     rndlet = ['A','B','C','D','E','F','G','H','I','J','K','M']
@@ -37,6 +37,7 @@ def take_pic(path, model):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         print(model.predict(frame)) #pass to Letter Predictor model
         num += 1
+        
         #Hit escape to quit camera 
         if k%256 == 27:
             print("Escape hit, closing...")
