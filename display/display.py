@@ -13,6 +13,7 @@ import websockets
 import json
 import threading
 import queue
+import time
 
 message_queue = queue.Queue()
 
@@ -20,21 +21,15 @@ message_queue = queue.Queue()
 async def handler(websocket, path):
     while True:
         data = message_queue.get()
-        print(data)
-
         await websocket.send(json.dumps(data))
         await asyncio.sleep(.25)
 
 
 def start_loop():
-
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    # new_loop.run_until_complete(start_server)
-    # new_loop.run_forever()
-    start_server = websockets.serve(handler, "127.0.0.1", 5000)
-
-    asyncio.get_event_loop().run_until_complete(start_server)
-    asyncio.get_event_loop().run_forever()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(websockets.serve(handler, "127.0.0.1", 5000))
+    loop.run_forever()
 
 
 class Display:
@@ -49,22 +44,52 @@ class Display:
     # For example, which letters have been observed, if the interpreter is waiting for a new letter,
     # or on cooldown after just observing a letter
 
-    def display_state(self, state):
+    def display_query(self, state):
 
         data = {
-            "type": "screen update",
+            "type": "query",
             "content": str(state)
         }
+        print("Displaying Query: ", state)
         message_queue.put(data)
-        print("Displaying State: ", state)
+        message_queue.put(data)
 
     # Display a loading screen while the outsourced VA is calling the API
     def display_loading(self):
         print("Displaying Loading")
 
+    def display_reset(self):
+        data = {
+            "type": "reset",
+        }
+        print("Displaying reset")
+        message_queue.put(data)
+        message_queue.put(data)
+
     # Display the result of the Virtual Assistant
+
     def display_result(self, result):
+        data = {
+            "type": "response",
+            "content": str(result)
+        }
         print("Displaying Result: ", result)
+        message_queue.put(data)
+        message_queue.put(data)
 
     def teardown(self):
         pass
+
+
+def main():
+    d = Display(start_display=False)
+
+    i = 0
+    while True:
+        d.display_query(i)
+        i += 1
+        time.sleep(1)
+
+
+if __name__ == "__main__":
+    main()

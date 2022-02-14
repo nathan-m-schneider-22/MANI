@@ -4,7 +4,8 @@ class sseRecieverPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentData: []
+      query: "",
+      response: ""
     };
     this.ws = new WebSocket("ws://127.0.0.1:5000/");
   }
@@ -15,22 +16,29 @@ class sseRecieverPage extends React.Component {
     };
 
     this.ws.onmessage = (event) => {
-      console.log(event.data)
+      const data = JSON.parse(event.data)
+      console.log(data)
+      if (data.type === "query"){
+        this.setState({query:data.content})
+      }
+      if (data.type === "response"){
+        this.setState({response:data.content})
+      }
+      if (data.type === "reset"){
+        this.setState({response:"",query:""})
+      }
       this.setState({ currentData: JSON.parse(event.data) });
     };
 
     this.ws.onclose = () => {
       console.log('Closed Connection!')
     };
-
-    const columns = [
-      { Header: 'Name', accessor: 'name' },
-      { Header: 'Number', accessor: 'number' }
-    ]
-    console.log(this.state.currentData);
+    
     return (
       <div className="App">
-        <p>TBD</p>
+        <h1>{this.state.query}</h1>
+        <h1>{this.state.response}</h1>
+
       </div>
     );
   }

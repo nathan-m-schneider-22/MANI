@@ -32,7 +32,7 @@ class Interpreter:
         for _ in range(5):
             result = self.parse_frame()
             input += result
-            self.display_instance.display_state(input)
+            self.display_instance.display_query(input)
             time.sleep(1)
         return input
 
