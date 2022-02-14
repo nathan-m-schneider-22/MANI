@@ -34,11 +34,16 @@ def take_pic(path, model):
 
     while(True):  # continuous picture taking
         ret, frame = cap.read()
-        cv2.imshow('frame', frame)
+        frame2 = cv2.resize(frame, (480, 360))                # Resize image
+
+        frame2 = cv2.flip(frame2, 1)
+        cv2.imshow('frame', frame2)
         k = cv2.waitKey(1)
+        cv2.moveWindow('frame', 240, 150)
+        cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
+
         #image_path = path + "/image" + str(num) + ".jpg"
         #cv2.imwrite(image_path, frame)
-        exit(1)
 
         print(model.predict(frame))  # pass to Letter Predictor model
         num += 1
