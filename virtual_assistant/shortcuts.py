@@ -1,4 +1,8 @@
-shortcuts = {"www": "What is the weather like now?", "ttt": "What time is it?"}
+shortcuts = {
+    "a": "What time is it?",
+    "www": "What is the weather like now?",
+    "ttt": "What time is it?"
+}
 
 
 def check_shortcut(input):
