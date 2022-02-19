@@ -12,8 +12,9 @@ class VirtualAssistant:
         self.display_instance = display
 
     def get_result(self, input):
+
         shortcut = check_shortcut(input)
-        self.display_instance.display_query(shortcut)
+        self.display_instance.display_state("send", {"input": shortcut})
         self.display_instance.display_loading()
 
         if shortcut != None:
