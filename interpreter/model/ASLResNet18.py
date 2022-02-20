@@ -1,6 +1,6 @@
 # imports
-import numpy as np # linear algebra
-import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import numpy as np  # linear algebra
+import pandas as pd  # data processing, CSV file I/O (e.g. pd.read_csv)
 
 import torchvision
 
@@ -13,15 +13,17 @@ from torchmetrics.functional import accuracy
 import pytorch_lightning as pl
 
 # asl model baseline
+
+
 class ASLResNet18(pl.LightningModule):
     def __init__(self, lr=0.05):
         super().__init__()
-    
+
         self.save_hyperparameters()
         self.model = torchvision.models.resnet18(pretrained=True)
         self.model.fc = nn.Linear(512, 29)
         self.loss_fxn = nn.CrossEntropyLoss(weight=None)
-    
+
     def forward(self, x):
         x = self.model(x)
         return x
@@ -36,7 +38,7 @@ class ASLResNet18(pl.LightningModule):
     def evaluate(self, batch, stage=None):
         x, y = batch
         logits = self.forward(x)
-        loss = self.loss_fxn(logits, y)       
+        loss = self.loss_fxn(logits, y)
         preds = torch.argmax(F.softmax(logits, dim=-1), dim=1)
         acc = accuracy(preds, y)
 
@@ -68,4 +70,3 @@ class ASLResNet18(pl.LightningModule):
             "interval": "step",
         }
         return {"optimizer": optimizer, "lr_scheduler": scheduler_dict}
-    
