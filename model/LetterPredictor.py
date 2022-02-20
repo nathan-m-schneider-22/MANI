@@ -26,10 +26,12 @@ class LetterPredictor:
         image = torch.unsqueeze(image,0)
         
         logits = self.model(image)
-        pred = torch.argmax(F.softmax(logits[:,0:3], dim=-1), dim=1)
+        pred_idx = [0, 1, 2]
+        pred = torch.argmax(F.softmax(logits[:,pred_idx], dim=-1), dim=1)
         #print(pred.item())
-        name = chr(pred.item()+65) # ascii code for upper case A
-        
+        #name = chr(pred.item()+65) # ascii code for upper case A
+        pred_to_letter = ["A", "B", "C"]
+        name = pred_to_letter[pred]
         return name
 
 
