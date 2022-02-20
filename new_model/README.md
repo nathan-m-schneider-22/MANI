@@ -2,9 +2,11 @@
 
 ## Demo 
 
-<figure class="video_container">
-  <iframe src="https://drive.google.com/file/d/1aEilVas_AXd7ekIgVujFziLdeZaxXXic/preview" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
+
+
+https://user-images.githubusercontent.com/43649954/154823537-f073398e-93b6-4c4f-b884-0bdd47eb7224.mp4
+
+
 
 ## Getting Started
 To test the new model, `cd new_model` and run `python mp_webcam.py`. 
