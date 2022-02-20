@@ -20,6 +20,7 @@ class MANI:
             self.display.display_result(result)
 
     def teardown(self):
+        print("Tearing down")
         self.display.teardown()
         self.interpreter.teardown()
         self.virtual_assistant.teardown()
