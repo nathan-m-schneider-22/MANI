@@ -21,6 +21,7 @@ class MANI:
                 result = self.virtual_assistant.get_result(input)
                 self.display.display_state("display", {"response": result})
                 self.display.display_result(result)
+                time.sleep(5)
 
     def teardown(self):
         print("Tearing down")

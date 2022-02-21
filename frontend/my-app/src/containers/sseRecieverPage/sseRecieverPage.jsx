@@ -25,6 +25,11 @@ class sseRecieverPage extends React.Component {
         this.setState({
           fsm_state: data.state
         })
+        if (data.state == 'sleep') {
+          this.setState({
+            input: '',
+          })
+        }
         if (data.state == 'green') {
           this.setState({
             top_letter: data.letter
@@ -70,7 +75,7 @@ class sseRecieverPage extends React.Component {
               <h1> Welcome to Project Mani</h1>
               {this.state.fsm_state == "sleep" && (
                 <div>
-                  <h1>{this.state.input}<span className='cursor'>_</span></h1>
+                  <h1><span className='cursor'>_</span></h1>
                   <h2> Hold your hand in the screen to start signing</h2>
                 </div>
               )}
