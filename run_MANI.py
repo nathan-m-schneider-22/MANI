@@ -22,6 +22,7 @@ class MANI:
             self.display.display_result(result)
 
     def teardown(self):
+        print("Tearing down")
         self.display.teardown()
         self.interpreter.teardown()
         self.virtual_assistant.teardown()
@@ -31,8 +32,9 @@ def main(args):
     mani_instance = MANI(args)
     try:
         mani_instance.main_loop()
-    except:
+    except Exception as e:
         mani_instance.teardown()
+        raise(e)
 
 
 if __name__ == "__main__":

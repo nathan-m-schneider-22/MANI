@@ -3,3 +3,12 @@ lib/
 pyvenv.cfg
 virtual_assistant/__pycache__/
 __pycache__/
+
+frontend/node_modules
+frontend/bower_components
+
+new_model/data
+new_model/output/distance
+new_model/output/distance_angles
+
+data/
