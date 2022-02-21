@@ -16,10 +16,10 @@ class MANI:
             self.interpreter.wait_for_input()
             self.display.display_reset()
             input = self.interpreter.capture_full_input()
-            result = self.virtual_assistant.get_result(input)
-            self.display.display_state("display", {"result": result})
-
-            self.display.display_result(result)
+            if input != "":
+                result = self.virtual_assistant.get_result(input)
+                self.display.display_state("display", {"result": result})
+                self.display.display_result(result)
 
     def teardown(self):
         print("Tearing down")
