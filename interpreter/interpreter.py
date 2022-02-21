@@ -21,7 +21,7 @@ class Interpreter:
     def display_frame(self, frame):
         frame = cv2.resize(frame, (480, 360))                # Resize image
         cv2.imshow('frame', frame)
-        cv2.moveWindow('frame', 240, 200)
+        # cv2.moveWindow('frame', 240, 200)
         cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
 
         k = cv2.waitKey(1)
