@@ -3,7 +3,10 @@ import requests
 
 def call_outsourced_API(input):
     print("Calling RPI API")
-    req = requests.post('http://raspberrypi.local:5000', json={'query': input})
+    # requests.post('http://raspberrypi.local:5000')
+    # print("GET DONE")
+    req = requests.post('http://raspberrypi.local:5000/',
+                        json={'query': input})
 
     return req.json()['response']
 
@@ -11,7 +14,8 @@ def call_outsourced_API(input):
 def main():
 
     while True:
-        print("<:", call_outsourced_API(input(">:")))
+        query = input(">:")
+        print("<:", call_outsourced_API(query))
 
 
 if __name__ == "__main__":

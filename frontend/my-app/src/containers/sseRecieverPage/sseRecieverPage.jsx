@@ -110,10 +110,10 @@ class sseRecieverPage extends React.Component {
                   <h2>Waiting for response from the server</h2>
                 </div>
               )}
-              {this.state.fsm_state == "sleep" && (
+              {this.state.fsm_state == "result" && (
                 <div>
                   <div>
-                    <h1>{this.state.input}</h1>
+                    <h2>{this.state.input}</h2>
                     <h1>{this.state.response}</h1>
                   </div>
                 </div>
