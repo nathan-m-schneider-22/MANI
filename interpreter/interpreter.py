@@ -28,6 +28,18 @@ class Interpreter:
             model_complexity=0,
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5)
+        
+        # interpreter sentence inference variables
+        self.state = np.array([1/26 for _ in range(26)])
+        self.curr_letter = ''
+        self.curr_input = ''
+        self.start_time = time.time()
+
+        # interpreter sentence hyperparameters
+        self.alpha = .04
+        self.theta = .35
+
+
 
     def display_frame(self, frame):
         frame = cv2.resize(frame, (480, 360))                # Resize image
@@ -58,10 +70,35 @@ class Interpreter:
                 # making prediction 
                 features, _ = extract_features([hand_landmarks], ['a'], input_type ='inference')
                 preds = self.model.predict_proba(features)
-                result = self.model.classes_[np.argmax(preds)]
+                self.state = self.state + self.alpha*(preds-self.state)
+                pred = self.model.classes_[np.argmax(self.state)]
+                if pred == '_':
+                    pred = ' '
+                if time.time()-self.start_time > 3 and np.max(self.state)>.35:
+                    if self.curr_letter != pred:
+                        self.curr_letter = pred
+                        
+                        if self.curr_letter == 'x':
+                            self.curr_input = self.curr_input[:-1]
+                            self.curr_letter = ''
+                            self.start_time = time.time()
+                        else:
+                            self.curr_input += pred
+                        
+                        self.display_instance.display_query(self.curr_input)
+
+                if self.curr_letter == 'q':
+                    state = np.array([1/26 for _ in range(26)])
+                    self.curr_letter = ""
+                    self.curr_input = ""
+                    self.start_time = time.time()
+                    pred = 'clear'
+
+                    self.display_instance.display_query(self.curr_input)
+                    self.input_finished = 1
+
                 break
 
-        return result
 
     # Wait for a user to initiate an input, returns when the user is about to give an input, runs on FSM
     def wait_for_input(self):
@@ -74,16 +111,14 @@ class Interpreter:
     # Captures the full sign input from the user, utilizes more complicated FSM logic
     def capture_full_input(self):
         print("Capturing input")
-        input = ""
-        frame_count = 40
-        # for this example lets just capture 5 letters 1 second apart
-        for _ in range(3):
-            for _ in range(frame_count):
-                result = self.parse_frame()
-            input += result
-            self.display_instance.display_query(input)
-            time.sleep(.5)
-        return input
+        start_time = time.time()
+        
+        self.input_finished = 0
+
+        while not self.input_finished:
+            self.parse_frame()
+
+        return self.curr_input
 
     def teardown(self):
         self.camera.teardown()
