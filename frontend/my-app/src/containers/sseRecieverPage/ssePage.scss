@@ -11,4 +11,20 @@
         font-size: 36px;
         color: yellow;
     }
+    .cursor {
+        opacity: 1;
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+        0% {
+            opacity: 100%;
+        }
+        50% {
+            opacity: 0%;
+        }
+        100% {
+            opacity: 100%;
+        }
+    }
 }

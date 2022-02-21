@@ -7,10 +7,12 @@ answers = {"BBC": "Unable to connect to the BBC"}
 def check_shortcut(input):
     if input in shortcuts.keys():
         return shortcuts[input]
-
     else:
-        return None
+        return input
 
 
 def get_shortcut_answer(input):
-    return answers[input]
+    try:
+        return answers[input]
+    except:
+        return None

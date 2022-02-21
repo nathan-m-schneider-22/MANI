@@ -80,6 +80,7 @@ class Interpreter:
                 preds = self.model.predict_proba(features)
                 self.state = self.state + self.alpha*(preds-self.state)
                 pred = self.model.classes_[np.argmax(self.state)]
+                self.display_instance.display_state('green', {"letter": pred, "input": self.curr_input})
                 if pred == '_':
                     pred = ' '
                 if time.time()-self.start_time > 3 and np.max(self.state) > .35:
@@ -92,7 +93,8 @@ class Interpreter:
                             self.start_time = time.time()
                         else:
                             self.curr_input += pred
-
+                        
+                        self.display_instance.display_state("save", {"input": self.curr_input})
                         self.display_instance.display_query(self.curr_input)
 
                 break
@@ -124,6 +126,7 @@ class Interpreter:
         frame = self.camera.capture_image()
         self.display_frame(frame)
 
+        start_time = time.time()
         while not self.is_hand_in_frame(frame):
             frame = self.camera.capture_image()
             self.display_frame(frame)

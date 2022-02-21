@@ -18,10 +18,12 @@ class VirtualAssistant:
         self.display_instance.display_loading()
 
         if shortcut != None:
-            time.sleep(5)  # TAKE OUT IN FINAL VERSION
-            return get_shortcut_answer(input)
             input = shortcut
-        time.sleep(5)  # TAKE OUT IN FINAL VERSION
+            answer = get_shortcut_answer(input)
+            if answer:
+                time.sleep(2)  # TAKE OUT IN FINAL VERSION
+                return answer
+        time.sleep(2)  # TAKE OUT IN FINAL VERSION
         result = call_outsourced_API(input)
         return result
 

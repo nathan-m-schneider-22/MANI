@@ -22,7 +22,7 @@ async def handler(websocket, path):
     while True:
         data = message_queue.get()
         await websocket.send(json.dumps(data))
-        await asyncio.sleep(.25)
+        await asyncio.sleep(.05)
 
 
 def start_loop():
@@ -40,6 +40,8 @@ class Display:
             startup_command = "cd frontend/my-app/ && npm run start &"
             os.system(startup_command)
             time.sleep(8)
+        
+        self.last_msg = {}
 
     # Display the state of the interpreter
     # For example, which letters have been observed, if the interpreter is waiting for a new letter,
@@ -90,8 +92,11 @@ class Display:
             "update": json.dumps(update)
         }
         body.update(data)
-        message_queue.put(body)
-        message_queue.put(body)
+
+        if self.last_msg != body:
+            self.last_msg = body
+            message_queue.put(body)
+            message_queue.put(body)
 
     def teardown(self):
         pass
