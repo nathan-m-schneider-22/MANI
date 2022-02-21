@@ -12,6 +12,7 @@ class MANI:
         self.virtual_assistant = VirtualAssistant(self.display)
 
     def main_loop(self):
+        self.display.display_state("sleep")
         while True:
             print("Starting Main Loop")
             self.interpreter.wait_for_input()
@@ -21,7 +22,7 @@ class MANI:
                 result = self.virtual_assistant.get_result(input)
                 self.display.display_state("display", {"response": result})
                 self.display.display_result(result)
-                time.sleep(5)
+                # time.sleep(5)
 
     def teardown(self):
         print("Tearing down")

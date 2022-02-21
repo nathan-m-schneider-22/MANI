@@ -47,7 +47,7 @@ class Interpreter:
 
         frame = cv2.resize(frame, (480, 360))                # Resize image
         cv2.imshow('frame', frame)
-        # cv2.moveWindow('frame', 240, 200)
+        cv2.moveWindow('frame', 30, 80)
         cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
 
         k = cv2.waitKey(1)
@@ -80,7 +80,8 @@ class Interpreter:
                 preds = self.model.predict_proba(features)
                 self.state = self.state + self.alpha*(preds-self.state)
                 pred = self.model.classes_[np.argmax(self.state)]
-                self.display_instance.display_state('green', {"letter": pred, "input": self.curr_input})
+                self.display_instance.display_state(
+                    'green', {"letter": pred, "input": self.curr_input})
                 if pred == '_':
                     pred = ' '
                 if time.time()-self.start_time > 3 and np.max(self.state) > .35:
@@ -93,8 +94,9 @@ class Interpreter:
                             self.start_time = time.time()
                         else:
                             self.curr_input += pred
-                        
-                        self.display_instance.display_state("save", {"input": self.curr_input})
+
+                        self.display_instance.display_state(
+                            "save", {"input": self.curr_input})
                         self.display_instance.display_query(self.curr_input)
 
                 break
@@ -120,7 +122,6 @@ class Interpreter:
 
     def wait_for_input(self):
         print("Waiting for user input")
-        self.display_instance.display_state("sleep")
         # For this example, lets assume we always wait 5 seconds before a user gives an input
         frame = self.camera.capture_image()
         self.display_frame(frame)

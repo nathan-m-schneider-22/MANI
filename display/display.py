@@ -26,9 +26,11 @@ async def handler(websocket, path):
 
 
 def start_loop():
+    print("Starting server")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(websockets.serve(handler, "127.0.0.1", 5000))
+    loop.run_until_complete(websockets.serve(
+        handler, "127.0.0.1", 5001, reuse_address=True, reuse_port=True))
     loop.run_forever()
 
 
@@ -40,7 +42,7 @@ class Display:
             startup_command = "cd frontend/my-app/ && npm run start &"
             os.system(startup_command)
             time.sleep(8)
-        
+
         self.last_msg = {}
 
     # Display the state of the interpreter

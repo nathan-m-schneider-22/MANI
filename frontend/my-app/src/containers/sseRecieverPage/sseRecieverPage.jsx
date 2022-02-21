@@ -10,7 +10,7 @@ class sseRecieverPage extends React.Component {
       response: "",
       loading: false
     };
-    this.ws = new WebSocket("ws://127.0.0.1:5000/");
+    this.ws = new WebSocket("ws://127.0.0.1:5001/");
   }
 
   render() {
@@ -72,15 +72,16 @@ class sseRecieverPage extends React.Component {
           <div className='row'>
             <div className='col'></div>
             <div className='col'>
-              <h1> Welcome to Project Mani</h1>
               {this.state.fsm_state == "sleep" && (
                 <div>
+                  <h1> Welcome to Project Mani</h1>
                   <h1><span className='cursor'>_</span></h1>
                   <h2> Hold your hand in the screen to start signing</h2>
                 </div>
               )}
               {this.state.fsm_state == "wait" && (
                 <div>
+                  <h1> Welcome to Project Mani</h1>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
                   <h2> Hold you hand in the screen to start signing</h2>
                 </div>
@@ -115,11 +116,11 @@ class sseRecieverPage extends React.Component {
                   <h2>Waiting for response from the server</h2>
                 </div>
               )}
-              {this.state.fsm_state == "result" && (
+              {this.state.fsm_state == "display" && (
                 <div>
                   <div>
                     <h2>{this.state.input}</h2>
-                    <h1>{this.state.response}</h1>
+                    <h2>{this.state.response}</h2>
                   </div>
                 </div>
               )}
