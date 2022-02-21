@@ -50,8 +50,6 @@ def find_xy_range(hand_landmarks,image_path):
 def find_hand(image):    
     with mp_hands.Hands(static_image_mode=True,max_num_hands=2,min_detection_confidence=0.5) as hands:
         results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        image_height, image_width, _ = image.shape
-        annotated_image = image.copy()
         for hand_landmarks in results.multi_hand_landmarks:
             cropped_image = find_xy_range(hand_landmarks,path)
     return cropped_image
