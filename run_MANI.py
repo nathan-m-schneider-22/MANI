@@ -30,8 +30,9 @@ def main(args):
     mani_instance = MANI(args)
     try:
         mani_instance.main_loop()
-    except:
+    except Exception as e:
         mani_instance.teardown()
+        raise(e)
 
 
 if __name__ == "__main__":
