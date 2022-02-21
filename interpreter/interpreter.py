@@ -10,6 +10,7 @@ from .new_model.preprocess.feature_extractor import extract_features
 # Interpreter class to parse images into signs, and build signs
 
 FRAME_RATE = 30
+SHOW_EVERY = 10
 
 
 class Interpreter:
@@ -23,6 +24,8 @@ class Interpreter:
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
         self.mp_hands = mp.solutions.hands
+        
+        self.frame = 0
 
         self.hands = self.mp_hands.Hands(
             model_complexity=0,
@@ -32,18 +35,23 @@ class Interpreter:
     def display_frame(self, frame):
         frame = cv2.resize(frame, (480, 360))                # Resize image
         cv2.imshow('frame', frame)
-        cv2.moveWindow('frame', 240, 200)
+        # cv2.moveWindow('frame', 240, 200)
         cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
-
+        # self.display_instance.display_image(frame)
         k = cv2.waitKey(1)
         if k % 256 == 27:
             print("Escape hit, closing...")
             exit(0)
-
+            
     # Parses the current frame from ASL to a letter
     def parse_frame(self):
         frame = self.camera.capture_image()
+        
+        # if self.frame % SHOW_EVERY == 0:
+        #     self.display_frame(frame)
         self.display_frame(frame)
+        # self.frame += 1
+        
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         k = cv2.waitKey(1)

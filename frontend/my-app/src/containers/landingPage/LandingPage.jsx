@@ -14,6 +14,7 @@ export default function LandingPage() {
       <Card margin="auto" width="400px">
         <Image src={maniLogo} height="200px" width="400px" draggable={false} />
         <center>
+
           <Text h2>M A N I </Text>
           <Text type="secondary" large center>
             The ASL Virtual Assistant

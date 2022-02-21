@@ -13,7 +13,7 @@ class MANI:
     def main_loop(self):
         while True:
             print("Starting Main Loop")
-            self.interpreter.wait_for_input()
+            # self.interpreter.wait_for_input()
             self.display.display_reset()
             input = self.interpreter.capture_full_input()
             result = self.virtual_assistant.get_result(input)

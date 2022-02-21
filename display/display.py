@@ -14,6 +14,8 @@ import json
 import threading
 import queue
 import time
+import cv2
+import base64
 
 message_queue = queue.Queue()
 
@@ -45,6 +47,20 @@ class Display:
     # For example, which letters have been observed, if the interpreter is waiting for a new letter,
     # or on cooldown after just observing a letter
 
+    def display_image(self, image):
+        # print("displaying frame")
+
+        retval, buffer = cv2.imencode('.jpg', image)
+        base64jpg = base64.b64encode(buffer)
+        base64str = base64jpg.decode('utf-8')
+        data = {
+            "type": "image",
+            "image": base64str
+        }
+        message_queue.put(data)
+        message_queue.put(data)
+
+        
     def display_query(self, state):
 
         data = {
