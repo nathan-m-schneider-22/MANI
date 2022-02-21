@@ -17,8 +17,7 @@ class Camera:
         ret, frame = self.cap.read()
         frame = cv2.flip(frame, 1)
 
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2BGRA)
-        return rgb
+        return frame
 
     # Release the components utilized by the camera
     def teardown(self):
