@@ -104,7 +104,6 @@ class Interpreter:
             print("FINISHE")
             state = np.array([1/26 for _ in range(26)])
             self.curr_letter = ""
-            self.curr_input = ""
             self.start_time = time.time()
             pred = 'clear'
 
@@ -135,7 +134,8 @@ class Interpreter:
     def capture_full_input(self):
         print("Capturing input")
         start_time = time.time()
-
+        self.curr_letter = ''
+        self.curr_input = ''
         self.input_finished = 0
 
         while not self.input_finished:
