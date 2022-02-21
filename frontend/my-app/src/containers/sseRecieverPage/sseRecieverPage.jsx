@@ -1,5 +1,6 @@
 import React from 'react';
-import loading from './loading.gif'
+import loading from './loading.gif';
+import './ssePage.scss';
 class sseRecieverPage extends React.Component {
   constructor(props) {
     super(props);
@@ -61,56 +62,63 @@ class sseRecieverPage extends React.Component {
     };
 
     return (
-      <div className='App'>
-        <div className='row'>
-          <div className='col'></div>
-          <div className='col'>
-            <h1> Welcome to Project Mani</h1>
-            {this.state.fsm_state == "sleep" && (
-              <div>
-                <h2> Hold your hand in the screen to start signing</h2>
-              </div>
-            )}
-            {this.state.fsm_state == "wait" && (
-              <div>
-                <h2> Hold you hand in the screen to start signing</h2>
-              </div>
-            )}
-            {this.state.fsm_state == "green" && (
-              <div>
-                <h1>{this.state.input}<span>_</span></h1>
-                <p className='top-letter'>{this.state.top_letter}</p>
-              </div>
-            )}
-            {this.state.fsm_state == "yellow" && (
-              <div>
-                <h1>{this.state.input}<span>_</span></h1>
-                <p className='letter-one'>{this.state.top_letter}</p>
-                <p className='letter-two'>{this.state.second_letter}</p>
-              </div>
-            )}
-            {this.state.fsm_state == "save" && (
-              <div>
-                <h1>{this.state.input}</h1>
-              </div>
-            )}
-            {this.state.fsm_state == "send" && (
-              <div>
-                <h1>{this.state.input}</h1>
-                <h2>Waiting for response from the server</h2>
-              </div>
-            )}
-            {this.state.fsm_state == "sleep" && (
-              <div>
+      <div className='app'>
+        <div className='sse-page'>
+          <div className='row'>
+            <div className='col'></div>
+            <div className='col'>
+              <h1> Welcome to Project Mani</h1>
+              {this.state.fsm_state == "sleep" && (
+                <div>
+                  <h2> Hold your hand in the screen to start signing</h2>
+                </div>
+              )}
+              {this.state.fsm_state == "wait" && (
+                <div>
+                  <h2> Hold you hand in the screen to start signing</h2>
+                </div>
+              )}
+              {this.state.fsm_state == "green" && (
+                <div>
+                  <h1>{this.state.input}<span>_</span></h1>
+                  <p className='top-letter'>{this.state.top_letter}</p>
+                </div>
+              )}
+              {this.state.fsm_state == "yellow" && (
+                <div>
+                  <h1>{this.state.input}<span>_</span></h1>
+                  <div className = 'row'>
+                    <div className = 'col'>
+                      <p className='letter-one'>{this.state.top_letter}</p>
+                    </div>
+                    <div className = 'col'>
+                      <p className='letter-two'>{this.state.second_letter}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {this.state.fsm_state == "save" && (
                 <div>
                   <h1>{this.state.input}</h1>
-                  <h1>{this.state.response}</h1>
                 </div>
-              </div>
-            )}
+              )}
+              {this.state.fsm_state == "send" && (
+                <div>
+                  <h1>{this.state.input}</h1>
+                  <h2>Waiting for response from the server</h2>
+                </div>
+              )}
+              {this.state.fsm_state == "sleep" && (
+                <div>
+                  <div>
+                    <h1>{this.state.input}</h1>
+                    <h1>{this.state.response}</h1>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
       </div>
     )
 
