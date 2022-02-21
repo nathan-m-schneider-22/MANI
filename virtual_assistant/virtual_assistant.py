@@ -23,6 +23,7 @@ class VirtualAssistant:
 
         result = call_outsourced_API(input)
         print("Result: ", result)
+        result = result[0].upper() + result[1:]
         return result
 
     def teardown(self):
