@@ -15,7 +15,8 @@ function App() {
         <Router>
           <Page className="geist" style={{ paddingTop: 0 }}>
             <Switch>
-              <Route exact path="/" component={LandingPage} />
+              {/* <Route exact path="/" component={LandingPage} /> */}
+              <Route exact path="/" component={sseRecieverPage} />
               <Route path="/assistant" component={AssistantPage} />
               <Route path="/shortcuts" component={ShortcutsPage} />
               <Route path="/sse" component={sseRecieverPage} />

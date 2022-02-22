@@ -12,3 +12,6 @@ new_model/output/distance
 new_model/output/distance_angles
 
 data/
+*.npy
+data/
+share/

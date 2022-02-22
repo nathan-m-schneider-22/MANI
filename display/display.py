@@ -22,24 +22,28 @@ async def handler(websocket, path):
     while True:
         data = message_queue.get()
         await websocket.send(json.dumps(data))
-        await asyncio.sleep(.25)
+        await asyncio.sleep(.05)
 
 
 def start_loop():
+    print("Starting server")
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    loop.run_until_complete(websockets.serve(handler, "127.0.0.1", 5000))
+    loop.run_until_complete(websockets.serve(
+        handler, "127.0.0.1", 5001, reuse_address=True, reuse_port=True))
     loop.run_forever()
 
 
 class Display:
     def __init__(self, start_display=True):
+        t = threading.Thread(target=start_loop)
+        t.start()
         if start_display:
             startup_command = "cd frontend/my-app/ && npm run start &"
             os.system(startup_command)
             time.sleep(8)
-        t = threading.Thread(target=start_loop)
-        t.start()
+
+        self.last_msg = {}
 
     # Display the state of the interpreter
     # For example, which letters have been observed, if the interpreter is waiting for a new letter,
@@ -82,6 +86,19 @@ class Display:
         print("Displaying Result: ", result)
         message_queue.put(data)
         message_queue.put(data)
+
+    def display_state(self, state, data={}, update=False):
+        body = {
+            "message_type": "state",
+            "state": state,
+            "update": json.dumps(update)
+        }
+        body.update(data)
+
+        if self.last_msg != body:
+            self.last_msg = body
+            message_queue.put(body)
+            message_queue.put(body)
 
     def teardown(self):
         pass

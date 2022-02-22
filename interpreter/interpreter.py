@@ -1,7 +1,9 @@
+from turtle import update
 from .camera import Camera
 import cv2
 import time
 import numpy as np
+import random
 import mediapipe as mp
 
 from joblib import load
@@ -10,6 +12,7 @@ from .new_model.preprocess.feature_extractor import extract_features
 # Interpreter class to parse images into signs, and build signs
 
 FRAME_RATE = 30
+YELLOW_ACC_THRESHOLD = .8
 
 
 class Interpreter:
@@ -44,7 +47,7 @@ class Interpreter:
 
         frame = cv2.resize(frame, (480, 360))                # Resize image
         cv2.imshow('frame', frame)
-        cv2.moveWindow('frame', 240, 200)
+        cv2.moveWindow('frame', 30, 80)
         cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
 
         k = cv2.waitKey(1)
@@ -77,6 +80,8 @@ class Interpreter:
                 preds = self.model.predict_proba(features)
                 self.state = self.state + self.alpha*(preds-self.state)
                 pred = self.model.classes_[np.argmax(self.state)]
+                self.display_instance.display_state(
+                    'green', {"letter": pred, "input": self.curr_input})
                 if pred == '_':
                     pred = ' '
                 if time.time()-self.start_time > 3 and np.max(self.state) > .35:
@@ -90,6 +95,8 @@ class Interpreter:
                         else:
                             self.curr_input += pred
 
+                        self.display_instance.display_state(
+                            "save", {"input": self.curr_input})
                         self.display_instance.display_query(self.curr_input)
 
                 break
@@ -99,7 +106,6 @@ class Interpreter:
             print("FINISHE")
             state = np.array([1/26 for _ in range(26)])
             self.curr_letter = ""
-            self.curr_input = ""
             self.start_time = time.time()
             pred = 'clear'
 
@@ -120,6 +126,7 @@ class Interpreter:
         frame = self.camera.capture_image()
         self.display_frame(frame)
 
+        start_time = time.time()
         while not self.is_hand_in_frame(frame):
             frame = self.camera.capture_image()
             self.display_frame(frame)
@@ -128,7 +135,8 @@ class Interpreter:
     def capture_full_input(self):
         print("Capturing input")
         start_time = time.time()
-
+        self.curr_letter = ''
+        self.curr_input = ''
         self.input_finished = 0
 
         while not self.input_finished:
