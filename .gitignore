@@ -11,9 +11,7 @@ new_model/data
 new_model/output/distance
 new_model/output/distance_angles
 
-<<<<<<< HEAD
 data/
 *.npy
-=======
 data/
->>>>>>> origin/new_shortcuts
+share/
