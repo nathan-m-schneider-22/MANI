@@ -80,8 +80,13 @@ class Interpreter:
                 preds = self.model.predict_proba(features)
                 self.state = self.state + self.alpha*(preds-self.state)
                 pred = self.model.classes_[np.argmax(self.state)]
+
+
+<< << << < HEAD
                 self.display_instance.display_state(
                     'green', {"letter": pred, "input": self.curr_input})
+== == == =
+>>>>>> > main
                 if pred == '_':
                     pred = ' '
                 if time.time()-self.start_time > 3 and np.max(self.state) > .35:
@@ -95,8 +100,11 @@ class Interpreter:
                         else:
                             self.curr_input += pred
 
+<< << << < HEAD
                         self.display_instance.display_state(
                             "save", {"input": self.curr_input})
+== == == =
+>>>>>> > main
                         self.display_instance.display_query(self.curr_input)
 
                 break
@@ -106,6 +114,10 @@ class Interpreter:
             print("FINISHE")
             state = np.array([1/26 for _ in range(26)])
             self.curr_letter = ""
+<<<<<<< HEAD
+=======
+            self.curr_input = ""
+>>>>>>> main
             self.start_time = time.time()
             pred = 'clear'
 
@@ -126,7 +138,10 @@ class Interpreter:
         frame = self.camera.capture_image()
         self.display_frame(frame)
 
+<<<<<<< HEAD
         start_time = time.time()
+=======
+>>>>>>> main
         while not self.is_hand_in_frame(frame):
             frame = self.camera.capture_image()
             self.display_frame(frame)
@@ -135,8 +150,12 @@ class Interpreter:
     def capture_full_input(self):
         print("Capturing input")
         start_time = time.time()
+<<<<<<< HEAD
         self.curr_letter = ''
         self.curr_input = ''
+=======
+
+>>>>>>> main
         self.input_finished = 0
 
         while not self.input_finished:
