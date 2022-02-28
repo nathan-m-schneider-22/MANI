@@ -10,7 +10,7 @@ class sseRecieverPage extends React.Component {
       response: "",
       loading: false
     };
-    this.ws = new WebSocket("ws://127.0.0.1:5001/");
+    this.ws = new WebSocket("ws://127.0.0.1:5002/");
   }
 
   render() {

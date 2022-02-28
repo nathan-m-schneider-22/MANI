@@ -21,10 +21,11 @@ class VirtualAssistant:
             print("Found: ", shortcut)
             input = shortcut
 
-        result = call_outsourced_API(input)
-        print("Result: ", result)
-        result = result[0].upper() + result[1:]
-        return result
+        text_result, html_result = call_outsourced_API(input)
+        print("HTML Results:", html_result)
+        print("Text Result: ", text_result)
+        text_result = text_result[0].upper() + text_result[1:]
+        return text_result, html_result
 
     def teardown(self):
         pass
