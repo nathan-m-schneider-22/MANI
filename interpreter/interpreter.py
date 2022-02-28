@@ -7,13 +7,13 @@ import random
 import mediapipe as mp
 
 from joblib import load
+from . import streamer
 from .new_model.preprocess.feature_extractor import extract_features
 
 # Interpreter class to parse images into signs, and build signs
 
 FRAME_RATE = 30
 YELLOW_ACC_THRESHOLD = .8
-
 
 class Interpreter:
     def __init__(self, display_instance):
@@ -45,15 +45,17 @@ class Interpreter:
 
     def display_frame(self, frame):
 
-        frame = cv2.resize(frame, (480, 360))                # Resize image
-        cv2.imshow('frame', frame)
-        cv2.moveWindow('frame', 30, 80)
-        cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
+        with streamer.lock:
+            streamer.outputFrame = frame.copy()
+        # frame = cv2.resize(frame, (480, 360))                # Resize image
+        # cv2.imshow('frame', frame)
+        # cv2.moveWindow('frame', 30, 80)
+        # cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
 
-        k = cv2.waitKey(1)
-        if k % 256 == 27:
-            print("Escape hit, closing...")
-            exit(0)
+        # k = cv2.waitKey(1)
+        # if k % 256 == 27:
+        #     print("Escape hit, closing...")
+        #     exit(0)
 
     # Parses the current frame from ASL to a letter
     def parse_frame(self):

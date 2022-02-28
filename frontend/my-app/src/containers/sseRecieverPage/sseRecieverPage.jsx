@@ -70,7 +70,9 @@ class sseRecieverPage extends React.Component {
       <div className='app'>
         <div className='sse-page'>
           <div className='row'>
-            <div className='col'></div>
+            <div className='col'>
+              <img src={'//127.0.0.1:5555/stream'} />
+            </div>
             <div className='col'>
               {this.state.fsm_state == "sleep" && (
                 <div>

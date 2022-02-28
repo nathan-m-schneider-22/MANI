@@ -1,13 +1,17 @@
+import socket
+import threading
 from interpreter.interpreter import Interpreter
 from display.display import Display
 from virtual_assistant.virtual_assistant import VirtualAssistant
+import interpreter.streamer as streamer
 import argparse
 import time
 
 
 class MANI:
     def __init__(self, args):
-        self.display = Display(start_display=not args.run_logic)
+        print(args)
+        self.display = Display(start_display=not args)
         self.interpreter = Interpreter(self.display)
         self.virtual_assistant = VirtualAssistant(self.display)
 
@@ -46,5 +50,10 @@ if __name__ == "__main__":
     parser.add_argument('--logic', dest='run_logic', action='store_true',
                         help='run only the core logic, no display')
 
-    args = parser.parse_args()
-    main(args)
+    args = vars(parser.parse_args())
+    t = threading.Thread(target=main, args=(args["run_logic"],))
+    t.daemon = True
+    t.start()
+
+    streamer.app.run(host='127.0.0.1', port='5555', debug=True,
+            threaded=True, use_reloader=False)
