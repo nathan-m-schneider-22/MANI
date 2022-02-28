@@ -9,21 +9,21 @@ import sseRecieverPage from "./containers/sseRecieverPage/sseRecieverPage";
 
 function App() {
   return (
-    <div style={{ backgroundColor: "#a8b4fc" }}>
-      <GeistProvider>
-        <CssBaseline />
-        <Router>
-          <Page className="geist" style={{ paddingTop: 0 }}>
-            <Switch>
+    <div style={{ backgroundColor: "#a8b4fc", padding: 0, margin: 0 }}>
+      {/* <GeistProvider style = {{ padding: 0, margin: 0}}> */}
+        {/* <CssBaseline /> */}
+        <Router style={{padding: 0}}>
+          <div style={{ padding: 0, margin: 0, width: '100vw', height:'100vh' }}>
+            <Switch >
               {/* <Route exact path="/" component={LandingPage} /> */}
-              <Route exact path="/" component={sseRecieverPage} />
+              <Route exact path="/" component={sseRecieverPage}/>
               <Route path="/assistant" component={AssistantPage} />
               <Route path="/shortcuts" component={ShortcutsPage} />
               <Route path="/sse" component={sseRecieverPage} />
             </Switch>
-          </Page>
+          </div>
         </Router>
-      </GeistProvider>
+      {/* </GeistProvider> */}
     </div>
   );
 }

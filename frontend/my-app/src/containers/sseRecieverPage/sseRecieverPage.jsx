@@ -1,3 +1,4 @@
+import { Spinner } from '@geist-ui/react';
 import React from 'react';
 import loading from './loading.gif';
 import './ssePage.scss';
@@ -70,18 +71,21 @@ class sseRecieverPage extends React.Component {
       <div className='app'>
         <div className='sse-page'>
           <div className='row'>
-            <div className='col'></div>
             <div className='col'>
+              <div className='video-container'>
+                <img src={'//127.0.0.1:5555/stream'} className='video'/>
+              </div>
+            </div>
+            <div className='col' style = {{textAlign: 'center'}}>
+              <h1 style={{paddingTop: "50px", paddingBottom: "50px"}}> Welcome to Project Mani</h1>
               {this.state.fsm_state == "sleep" && (
                 <div>
-                  <h1> Welcome to Project Mani</h1>
                   <h1><span className='cursor'>_</span></h1>
-                  <h2> Hold your hand in the screen to start signing</h2>
+                  <h2>Hold your hand in the screen to start signing</h2>
                 </div>
               )}
               {this.state.fsm_state == "wait" && (
                 <div>
-                  <h1> Welcome to Project Mani</h1>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
                   <h2> Hold you hand in the screen to start signing</h2>
                 </div>
@@ -90,6 +94,7 @@ class sseRecieverPage extends React.Component {
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
                   <p className='top-letter'>{this.state.top_letter}</p>
+                  <h2>{this.state.response}</h2>
                 </div>
               )}
               {this.state.fsm_state == "yellow" && (
@@ -108,18 +113,21 @@ class sseRecieverPage extends React.Component {
               {this.state.fsm_state == "save" && (
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
+                  <h2>{this.state.response}</h2>
                 </div>
               )}
               {this.state.fsm_state == "send" && (
                 <div>
                   <h1>{this.state.input}</h1>
+                  <br/>
+                  <Spinner style={{margin: 'auto'}}/>
                   <h2>Waiting for response from the server</h2>
                 </div>
               )}
               {this.state.fsm_state == "display" && (
                 <div>
                   <div>
-                    <h2>{this.state.input}</h2>
+                    <h1>{this.state.input}</h1>
                     <h2>{this.state.response}</h2>
                   </div>
                 </div>
