@@ -24,6 +24,7 @@ class VirtualAssistant:
 
         self.display_instance.display_state("send", {"input": input})
         if self.mock_va:
+            time.sleep(3)
             print("Using mock VA response")
             return "Mock VA response"
         else:

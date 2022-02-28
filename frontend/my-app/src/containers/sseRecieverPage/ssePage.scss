@@ -1,7 +1,11 @@
 .sse-page {
+    display: flex;
+    flex-direction: row;
+
     .video-container {
-        display: flex;
-        height: 100vh;
+        margin: 40px;
+        border-style: solid;
+        border-width: 6px;
         justify-content: center;
         align-items: center;
     }
@@ -36,4 +40,22 @@
             opacity: 100%;
         }
     }
+}
+
+.header{
+    margin-top: "50px";
+    padding-bottom: "50px";
+    text-align: center;
+    font-size: 36pt;
+}
+
+.text_container{    
+    margin: 40px;
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+}
+
+.spinner{
+    width: 100px;
 }

@@ -10,7 +10,6 @@ import time
 
 class MANI:
     def __init__(self, args):
-        print(args)
         self.display = Display(start_display=not args['run_logic'])
         self.interpreter = Interpreter(self.display)
         self.virtual_assistant = VirtualAssistant(self.display,mock_va=bool(args['mock_va']))

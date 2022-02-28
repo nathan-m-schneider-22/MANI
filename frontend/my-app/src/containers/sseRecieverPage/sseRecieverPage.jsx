@@ -7,6 +7,7 @@ class sseRecieverPage extends React.Component {
     super(props);
     this.state = {
       query: "",
+      input: "",
       fsm_state: "sleep",
       response: "",
       loading: false
@@ -22,37 +23,37 @@ class sseRecieverPage extends React.Component {
     this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
       // console.log(data)
-      if (data.message_type == 'state') {
+      if (data.message_type === 'state') {
         this.setState({
           fsm_state: data.state
         })
-        if (data.state == 'sleep') {
+        if (data.state === 'sleep') {
           this.setState({
             input: '',
           })
         }
-        if (data.state == 'green') {
+        if (data.state === 'green') {
           this.setState({
             top_letter: data.letter
           })
         }
-        if (data.state == 'yellow') {
+        if (data.state === 'yellow') {
           this.setState({
             top_letter: data.letters[0],
             second_letter: data.letters[1]
           })
         }
-        if (data.state == 'save') {
+        if (data.state === 'save') {
           this.setState({
             input: data.input
           })
         }
-        if (data.state == 'send') {
+        if (data.state === 'send') {
           this.setState({
             input: data.input
           })
         }
-        if (data.state == 'display') {
+        if (data.state === 'display') {
           this.setState({
             response: data.response
           })
@@ -68,63 +69,50 @@ class sseRecieverPage extends React.Component {
     };
 
     return (
-      <div className='app'>
+      <div>
+      <h1 className="header"> Welcome to Project MANI</h1>
         <div className='sse-page'>
-          <div className='row'>
-            <div className='col'>
-              <div className='video-container'>
-                <img src={'//127.0.0.1:5555/stream'} className='video'/>
-              </div>
+
+            <div className='video-container'>
+              <img src={'//127.0.0.1:5555/stream'} className='video'/>
             </div>
-            <div className='col' style = {{textAlign: 'center'}}>
-              <h1 style={{paddingTop: "50px", paddingBottom: "50px"}}> Welcome to Project Mani</h1>
-              {this.state.fsm_state == "sleep" && (
+            
+            <div className='text_container'>
+              {this.state.fsm_state === "sleep" && (
                 <div>
                   <h1><span className='cursor'>_</span></h1>
                   <h2>Hold your hand in the screen to start signing</h2>
                 </div>
               )}
-              {this.state.fsm_state == "wait" && (
+              {this.state.fsm_state === "wait" && (
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
                   <h2> Hold you hand in the screen to start signing</h2>
                 </div>
               )}
-              {this.state.fsm_state == "green" && (
+              {this.state.fsm_state === "green" && (
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
                   <p className='top-letter'>{this.state.top_letter}</p>
                   <h2>{this.state.response}</h2>
                 </div>
               )}
-              {this.state.fsm_state == "yellow" && (
+              {this.state.fsm_state === "save" && (
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
-                  <div className = 'row'>
-                    <div className = 'col'>
-                      <p className='letter-one'>{this.state.top_letter}</p>
-                    </div>
-                    <div className = 'col'>
-                      <p className='letter-two'>{this.state.second_letter}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {this.state.fsm_state == "save" && (
-                <div>
-                  <h1>{this.state.input}<span className='cursor'>_</span></h1>
+
                   <h2>{this.state.response}</h2>
                 </div>
               )}
-              {this.state.fsm_state == "send" && (
+              {this.state.fsm_state === "send" && (
                 <div>
                   <h1>{this.state.input}</h1>
                   <br/>
-                  <Spinner style={{margin: 'auto'}}/>
-                  <h2>Waiting for response from the server</h2>
+
+                  <Spinner className="spinner" style={{margin: 'auto'}}/>
                 </div>
               )}
-              {this.state.fsm_state == "display" && (
+              {this.state.fsm_state === "display" && (
                 <div>
                   <div>
                     <h1>{this.state.input}</h1>
@@ -134,7 +122,6 @@ class sseRecieverPage extends React.Component {
               )}
             </div>
           </div>
-        </div>
       </div>
     )
 

@@ -9,7 +9,7 @@ import sseRecieverPage from "./containers/sseRecieverPage/sseRecieverPage";
 
 function App() {
   return (
-    <div style={{ backgroundColor: "#a8b4fc", padding: 0, margin: 0 }}>
+    <div style={{ backgroundColor: "#ced5fd", padding: 0, margin: 0 }}>
       {/* <GeistProvider style = {{ padding: 0, margin: 0}}> */}
         {/* <CssBaseline /> */}
         <Router style={{padding: 0}}>
