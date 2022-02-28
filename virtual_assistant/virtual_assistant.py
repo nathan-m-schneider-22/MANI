@@ -14,12 +14,13 @@ class VirtualAssistant:
     def get_result(self, input):
         print("Checking shortcut")
         shortcut = check_shortcut(input)
-        self.display_instance.display_state("send", {"input": shortcut})
         self.display_instance.display_loading()
 
         if shortcut != None:
             print("Found: ", shortcut)
             input = shortcut
+
+        self.display_instance.display_state("send", {"input": input})
 
         result = call_outsourced_API(input)
         print("Result: ", result)

@@ -1,9 +1,13 @@
 import threading
 import cv2
+from .camera import Camera
 from flask import Flask, Response
 
 outputFrame = None
 lock = threading.Lock()
+display_raw_frame = False
+frame = None
+camera = Camera()
 
 app = Flask(__name__)
 
@@ -12,19 +16,20 @@ def stream():
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
 def generate():
-    global lock, outputFrame
+    global lock, outputFrame, frame, camera, display_raw_frame
 
     # loop over frames from the output stream
     while True:
-        print('here')
         # wait until the lock is acquired
         with lock:
+            
+            frame = camera.capture_image()
+            if display_raw_frame and frame is not None:
+                outputFrame = frame.copy()
             # check if the output frame is available, otherwise skip
             # the iteration of the loop
-            print('here')
             if outputFrame is None:
                 continue
-            print('yay')
             # encode the frame in JPEG format
             (flag, encodedImage) = cv2.imencode(".jpg", outputFrame)
 

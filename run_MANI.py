@@ -23,7 +23,9 @@ class MANI:
             self.display.display_reset()
             input = self.interpreter.capture_full_input()
             if input != "":
+                streamer.display_raw_frame = True
                 result = self.virtual_assistant.get_result(input)
+                streamer.display_raw_frame = False
                 self.display.display_state("display", {"response": result})
                 self.display.display_result(result)
                 # time.sleep(5)
