@@ -120,7 +120,10 @@ class sseRecieverPage extends React.Component {
                 <div>
                   <div>
                     <h2>{this.state.input}</h2>
-                    <h2>{this.state.response}</h2>
+                    {/* <h2>{this.state.response}</h2> */}
+                    <div>
+                    <iframe className="assistant-frame" title="MANI" srcdoc={this.state.response}></iframe>
+                    </div>
                   </div>
                 </div>
               )}

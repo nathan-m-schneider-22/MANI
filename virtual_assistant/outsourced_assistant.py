@@ -8,7 +8,8 @@ def call_outsourced_API(input):
     req = requests.post('http://raspberrypi.local:5000/',
                         json={'query': input})
 
-    return req.json()['response'], req.json()['html']
+    # return req.json()['response'], req.json()['html']
+    return req.json()['html']
 
 
 def main():
