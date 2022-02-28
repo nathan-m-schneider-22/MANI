@@ -8,10 +8,10 @@ from scipy.stats import zscore
 from os.path import exists
 
 
-from dataset_loaders import load_all, load_ethan_asl, load_alphabet, load_hand_gestures, load_alphabet_test
-from dataset_loaders import load_fingerspelling
+from .dataset_loaders import load_all, load_ethan_asl, load_alphabet, load_hand_gestures, load_alphabet_test
+from .dataset_loaders import load_fingerspelling
 
-def images_to_landmarks(paths, labels, mode='debug'):
+def images_to_landmarks(paths, labels, mode='inference'):
     if mode == 'debug':
         print("Convering images to landmarks...")
 
@@ -110,7 +110,7 @@ def extract_axis_angles(landmarks_list):
     
     return np.array(angle_features)
 
-def landmarks_to_np(landmarks_list, mode = 'debug'):
+def landmarks_to_np(landmarks_list, mode = 'inference'):
     if mode == 'debug':
         print("Convering landmarks to numpy array...")
 
@@ -139,15 +139,15 @@ def extract_features(paths, labels, input_type='images'):
 
     # transform features
     landmarks_np = landmarks_to_np(landmarks_list)
-    distance_features = extract_distances(landmarks_np)
+    #distance_features = extract_distances(landmarks_np)
     #pairwise_angle_features = extract_pairwise_angles(landmarks_np)
     segment_angle_features = extract_segment_angles(landmarks_np)
     axis_angle_features = extract_axis_angles(landmarks_np)
-    print(distance_features.shape)
-    print(segment_angle_features.shape)
-    print(axis_angle_features.shape)
+    #print(distance_features.shape)
+    #print(segment_angle_features.shape)
+    #print(axis_angle_features.shape)
 
-    features = np.hstack([distance_features, segment_angle_features, axis_angle_features])
+    features = np.hstack([segment_angle_features, axis_angle_features])
 
     return features, labels
 
