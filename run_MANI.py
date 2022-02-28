@@ -11,9 +11,9 @@ import time
 class MANI:
     def __init__(self, args):
         print(args)
-        self.display = Display(start_display=not args)
+        self.display = Display(start_display=not args['run_logic'])
         self.interpreter = Interpreter(self.display)
-        self.virtual_assistant = VirtualAssistant(self.display,mock_va=bool(args.mock_va))
+        self.virtual_assistant = VirtualAssistant(self.display,mock_va=bool(args['mock_va']))
 
     def main_loop(self):
         self.display.display_state("sleep")
@@ -38,6 +38,8 @@ class MANI:
 
 
 def main(args):
+    print(args)
+
     mani_instance = MANI(args)
     try:
         mani_instance.main_loop()
@@ -52,10 +54,10 @@ if __name__ == "__main__":
     parser.add_argument('--logic', dest='run_logic', action='store_true',
                         help='run only the core logic, no display')
     parser.add_argument('--mock', dest='mock_va', action='store_true',
-                        help='run only the core logic, no display')
+                        help='use mock responses for VA, not requiring')
 
     args = vars(parser.parse_args())
-    t = threading.Thread(target=main, args=(args["run_logic"],))
+    t = threading.Thread(target=main, args=(args,))
     t.daemon = True
     t.start()
 
