@@ -1,7 +1,9 @@
 .sse-page {
+    border-style: dotted;
+    display: flex;
+    flex-direction: row;
     .video-container {
-        display: flex;
-        height: 100vh;
+        
         justify-content: center;
         align-items: center;
     }
@@ -36,4 +38,17 @@
             opacity: 100%;
         }
     }
+}
+
+.header{
+    padding-top: "50px";
+    padding-bottom: "50px";
+    text-align: center;
+}
+
+.text_container{
+    border-style: dotted;
+    display: flex;
+    flex-direction: row;
+    width: 50%;
 }
