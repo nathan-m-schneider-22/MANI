@@ -8,10 +8,10 @@ from scipy.stats import zscore
 from os.path import exists
 
 
-from .dataset_loaders import load_all, load_ethan_asl, load_alphabet, load_hand_gestures, load_alphabet_test
-from .dataset_loaders import load_fingerspelling
+from dataset_loaders import load_all, load_ethan_asl, load_alphabet, load_hand_gestures, load_alphabet_test
+from dataset_loaders import load_fingerspelling
 
-def images_to_landmarks(paths, labels, mode='inference'):
+def images_to_landmarks(paths, labels, mode='debug'):
     if mode == 'debug':
         print("Convering images to landmarks...")
 
@@ -35,7 +35,6 @@ def images_to_landmarks(paths, labels, mode='inference'):
 
             if not results.multi_hand_landmarks:
                 continue
-
             for hand_landmarks in results.multi_hand_landmarks:
                 landmarks.append(hand_landmarks)
                 landmark_labels.append(label)
@@ -71,8 +70,31 @@ def extract_pairwise_angles(landmarks_list):
     
     return np.array(angle_features)
 
-def extract_connection_angles(landmarks_list):
-    pass
+def extract_segment_angles(landmarks_list):
+    angle_features = []
+    
+    mp_hands = mp.solutions.hands
+    hand_connections = mp_hands.HAND_CONNECTIONS
+    for landmarks in landmarks_list:
+        segment_vectors = np.zeros(shape=(0,3))
+        for con in hand_connections:
+            pt1 = landmarks[con[0]]
+            pt2 = landmarks[con[1]]
+            segment_vectors = np.vstack((segment_vectors, np.expand_dims(pt1-pt2, axis=0)))
+
+        x = segment_vectors
+        y = segment_vectors
+
+        dotprod_mat = np.einsum('ij,kj->ik', x, y)
+        costheta = dotprod_mat / la.norm(x, axis=1)[:, np.newaxis]
+        costheta /= la.norm(y, axis=1)
+        angles = costheta.flatten()
+        angles = np.nan_to_num(angles)
+        angle_features.append(angles)
+
+
+    return np.array(angle_features)
+
 def extract_axis_angles(landmarks_list):
     angle_features = []
     for landmarks in landmarks_list:
@@ -88,7 +110,7 @@ def extract_axis_angles(landmarks_list):
     
     return np.array(angle_features)
 
-def landmarks_to_np(landmarks_list, mode = 'inference'):
+def landmarks_to_np(landmarks_list, mode = 'debug'):
     if mode == 'debug':
         print("Convering landmarks to numpy array...")
 
@@ -118,10 +140,14 @@ def extract_features(paths, labels, input_type='images'):
     # transform features
     landmarks_np = landmarks_to_np(landmarks_list)
     distance_features = extract_distances(landmarks_np)
-    pairwise_angle_features = extract_pairwise_angles(landmarks_np)
+    #pairwise_angle_features = extract_pairwise_angles(landmarks_np)
+    segment_angle_features = extract_segment_angles(landmarks_np)
     axis_angle_features = extract_axis_angles(landmarks_np)
+    print(distance_features.shape)
+    print(segment_angle_features.shape)
+    print(axis_angle_features.shape)
 
-    features = np.hstack([distance_features, pairwise_angle_features, axis_angle_features])
+    features = np.hstack([distance_features, segment_angle_features, axis_angle_features])
 
     return features, labels
 
@@ -166,6 +192,7 @@ if __name__ == "__main__":
     np.save('../output/test_features.npy', test_features)
     np.save('../output/test_labels.npy', test_labels)
 
+    
     train_features = np.array([])
     train_labels = np.array([])
     train_dataset_list = ["hand_gestures", "alphabet_test", "alphabet", "fingerspelling"]
@@ -176,4 +203,5 @@ if __name__ == "__main__":
     
     np.save('../output/train_features.npy', train_features)
     np.save('../output/train_labels.npy', train_labels)
+    
 
