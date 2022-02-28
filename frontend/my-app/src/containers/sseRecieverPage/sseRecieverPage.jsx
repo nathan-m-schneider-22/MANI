@@ -115,8 +115,11 @@ class sseRecieverPage extends React.Component {
               {this.state.fsm_state === "display" && (
                 <div>
                   <div>
-                    <h1>{this.state.input}</h1>
-                    <h2>{this.state.response}</h2>
+                    <h2>{this.state.input}</h2>
+                    {/* <h2>{this.state.response}</h2> */}
+                    <div>
+                    <iframe className="assistant-frame" title="MANI" srcdoc={this.state.response}></iframe>
+                    </div>
                   </div>
                 </div>
               )}
