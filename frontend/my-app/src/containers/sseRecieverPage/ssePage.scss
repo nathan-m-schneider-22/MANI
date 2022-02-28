@@ -1,9 +1,11 @@
 .sse-page {
-    border-style: dotted;
     display: flex;
     flex-direction: row;
+
     .video-container {
-        
+        margin: 40px;
+        border-style: solid;
+        border-width: 6px;
         justify-content: center;
         align-items: center;
     }
@@ -41,14 +43,19 @@
 }
 
 .header{
-    padding-top: "50px";
+    margin-top: "50px";
     padding-bottom: "50px";
     text-align: center;
+    font-size: 36pt;
 }
 
-.text_container{
-    border-style: dotted;
+.text_container{    
+    margin: 40px;
     display: flex;
     flex-direction: row;
     width: 50%;
+}
+
+.spinner{
+    width: 100px;
 }

@@ -73,9 +73,9 @@ class sseRecieverPage extends React.Component {
       <h1 className="header"> Welcome to Project MANI</h1>
         <div className='sse-page'>
 
-              <div className='video-container'>
-                <img src={'//127.0.0.1:5555/stream'} className='video'/>
-              </div>
+            <div className='video-container'>
+              <img src={'//127.0.0.1:5555/stream'} className='video'/>
+            </div>
             
             <div className='text_container'>
               {this.state.fsm_state === "sleep" && (
@@ -100,6 +100,7 @@ class sseRecieverPage extends React.Component {
               {this.state.fsm_state === "save" && (
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
+
                   <h2>{this.state.response}</h2>
                 </div>
               )}
@@ -107,7 +108,8 @@ class sseRecieverPage extends React.Component {
                 <div>
                   <h1>{this.state.input}</h1>
                   <br/>
-                  <Spinner style={{margin: 'auto'}}/>
+
+                  <Spinner className="spinner" style={{margin: 'auto'}}/>
                 </div>
               )}
               {this.state.fsm_state === "display" && (
