@@ -13,7 +13,7 @@ class MANI:
         print(args)
         self.display = Display(start_display=not args)
         self.interpreter = Interpreter(self.display)
-        self.virtual_assistant = VirtualAssistant(self.display)
+        self.virtual_assistant = VirtualAssistant(self.display,mock_va=bool(args.mock_va))
 
     def main_loop(self):
         self.display.display_state("sleep")
@@ -50,6 +50,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     parser.add_argument('--logic', dest='run_logic', action='store_true',
+                        help='run only the core logic, no display')
+    parser.add_argument('--mock', dest='mock_va', action='store_true',
                         help='run only the core logic, no display')
 
     args = vars(parser.parse_args())
