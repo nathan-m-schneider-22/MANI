@@ -38,17 +38,20 @@ state_buffer = np.ones(shape=(0,26))
 time_buffer = []
 
 pred = ""
-alpha = .04
+alpha = .1
+theta = .2
+buffer_size = 5
 state = np.array([1/26 for _ in range(26)])
 curr_letter = ""
 curr_string = ""
 curr_pred = ""
 
+buffer = ['*' for _ in range(buffer_size)]
 # For webcam input:
 cap = cv2.VideoCapture(0)
 
 start_time = time.time()
-
+curr_time = time.time()
 with mp_hands.Hands(
     model_complexity=0,
     min_detection_confidence=0.5,
@@ -71,6 +74,7 @@ with mp_hands.Hands(
     # Draw the hand annotations on the image.
     image.flags.writeable = True
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    
     if results.multi_hand_landmarks:
       for hand_landmarks in results.multi_hand_landmarks:
         # making prediction 
@@ -82,17 +86,26 @@ with mp_hands.Hands(
         state = state + alpha*(preds-state)
         curr_pred = model.classes_[np.argmax(state)]
         pred = model.classes_[np.argmax(state)]
-        if pred == '_':
-            pred = ' ' 
-        if time.time()-start_time > 3 and np.max(state)>.35:
-            if curr_letter != pred:
-                curr_letter = pred
+        cp = model.classes_[np.argmax(preds)]
+        buffer.pop(0)
+        buffer.append(cp)
+        #print(time.time()-curr_time)
+        curr_time = time.time()
+        if cp == '_':
+            cp = ' ' 
+        #if time.time()-start_time > 3 and np.max(state)>theta:
+        if all(x == buffer[0] for x in buffer):
+            if curr_letter != cp:
+                curr_letter = cp
                 if curr_letter == 'x':
                     curr_string = curr_string[:-1]
                     curr_letter = ''
-                    start_time = time.time()
                 else:
-                    curr_string += pred
+                    curr_string += curr_letter
+                buffer = ['*' for _ in range(buffer_size)]
+            else:
+                curr_letter = ''
+                buffer =  ['*' for _ in range(2*buffer_size)]
 
         mp_drawing.draw_landmarks(
             image,
@@ -105,7 +118,7 @@ with mp_hands.Hands(
             state = np.array([1/26 for _ in range(26)])
             curr_letter = ""
             curr_string = ""
-            start_time = time.time()
+            buffer = ['*' for _ in range(buffer_size)]
             pred = 'clear'
     else:
         pred = 'no hand'
