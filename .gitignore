@@ -7,8 +7,11 @@ __pycache__/
 frontend/node_modules
 frontend/bower_components
 
-new_model/data
-new_model/output/distance
-new_model/output/distance_angles
+interpreter/new_model/data
+interpreter/new_model/output/distance
+interpreter/new_model/output/distance_angles
+interpreter/new_model/output/distance_segment_angles
+interpreter/new_model/output/distance_segment_angles_big
+interpreter/new_model/wandb
 
 data/

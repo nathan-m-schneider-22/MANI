@@ -46,7 +46,7 @@ def image_folder_loader(rootdir, samples_per_letter = int(10e9)):
 
 def load_alphabet_test():
     rootdir = '../data/asl_alphabet_test_dataset/'
-    image_paths, labels = image_folder_loader(rootdir, samples_per_letter=200)
+    image_paths, labels = image_folder_loader(rootdir, samples_per_letter=300)
     return image_paths, labels
 
 def load_ethan_asl():
@@ -56,12 +56,12 @@ def load_ethan_asl():
 
 def load_alphabet():
     rootdir = '../data/asl_alphabet_dataset/'
-    image_paths, labels = image_folder_loader(rootdir, samples_per_letter=50)
+    image_paths, labels = image_folder_loader(rootdir, samples_per_letter=300)
     return image_paths, labels
 
 def load_fingerspelling():
     rootdir = '../data/fingerspelling_dataset/'
-    image_paths, labels = image_folder_loader(rootdir, samples_per_letter=50)
+    image_paths, labels = image_folder_loader(rootdir, samples_per_letter=120)
     return image_paths, labels
 
 def load_all():
@@ -74,7 +74,6 @@ def load_all():
     labels = labels_hg + labels_at + labels_a + labels_fs
 
     return image_paths, labels
-
 
 
 if __name__ == "__main__":
