@@ -1,14 +1,16 @@
 import React from 'react';
-import loading from './loading.gif'
+import loading from './loading.gif';
+import './ssePage.scss';
 class sseRecieverPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       query: "",
+      fsm_state: "sleep",
       response: "",
-      loading:false
+      loading: false
     };
-    this.ws = new WebSocket("ws://127.0.0.1:5000/");
+    this.ws = new WebSocket("ws://127.0.0.1:5001/");
   }
 
   render() {
@@ -18,34 +20,116 @@ class sseRecieverPage extends React.Component {
 
     this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data)
-      console.log(data)
-      if (data.type === "query"){
-        this.setState({query:data.content,loading:false})
-      }
-      if (data.type === "response"){
-        this.setState({response:data.content,loading:false})
-      }
-      if (data.type === "reset"){
-        this.setState({response:"",query:"",loading:false})
-      }
-      if (data.type === "loading"){
-        this.setState({loading:true})
+      // console.log(data)
+      if (data.message_type == 'state') {
+        this.setState({
+          fsm_state: data.state
+        })
+        if (data.state == 'sleep') {
+          this.setState({
+            input: '',
+          })
+        }
+        if (data.state == 'green') {
+          this.setState({
+            top_letter: data.letter
+          })
+        }
+        if (data.state == 'yellow') {
+          this.setState({
+            top_letter: data.letters[0],
+            second_letter: data.letters[1]
+          })
+        }
+        if (data.state == 'save') {
+          this.setState({
+            input: data.input
+          })
+        }
+        if (data.state == 'send') {
+          this.setState({
+            input: data.input
+          })
+        }
+        if (data.state == 'display') {
+          this.setState({
+            response: data.response
+          })
+        }
       }
 
       this.setState({ currentData: JSON.parse(event.data) });
+      console.log(this.state)
     };
 
     this.ws.onclose = () => {
       console.log('Closed Connection!')
     };
-    
+
     return (
-      <div className="App">
-        <h1>{this.state.query}</h1>
-        <h1>{this.state.response}</h1>
-        {this.state.loading && <img width={30} src={loading}></img>}
+      <div className='app'>
+        <div className='sse-page'>
+          <div className='row'>
+            <div className='col'></div>
+            <div className='col'>
+              {this.state.fsm_state == "sleep" && (
+                <div>
+                  <h1> Welcome to Project Mani</h1>
+                  <h1><span className='cursor'>_</span></h1>
+                  <h2> Hold your hand in the screen to start signing</h2>
+                </div>
+              )}
+              {this.state.fsm_state == "wait" && (
+                <div>
+                  <h1> Welcome to Project Mani</h1>
+                  <h1>{this.state.input}<span className='cursor'>_</span></h1>
+                  <h2> Hold you hand in the screen to start signing</h2>
+                </div>
+              )}
+              {this.state.fsm_state == "green" && (
+                <div>
+                  <h1>{this.state.input}<span className='cursor'>_</span></h1>
+                  <p className='top-letter'>{this.state.top_letter}</p>
+                </div>
+              )}
+              {this.state.fsm_state == "yellow" && (
+                <div>
+                  <h1>{this.state.input}<span className='cursor'>_</span></h1>
+                  <div className = 'row'>
+                    <div className = 'col'>
+                      <p className='letter-one'>{this.state.top_letter}</p>
+                    </div>
+                    <div className = 'col'>
+                      <p className='letter-two'>{this.state.second_letter}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {this.state.fsm_state == "save" && (
+                <div>
+                  <h1>{this.state.input}<span className='cursor'>_</span></h1>
+                </div>
+              )}
+              {this.state.fsm_state == "send" && (
+                <div>
+                  <h1>{this.state.input}</h1>
+                  <h2>Waiting for response from the server</h2>
+                </div>
+              )}
+              {this.state.fsm_state == "display" && (
+                <div>
+                  <div>
+                    <h2>{this.state.input}</h2>
+                    <h2>{this.state.response}</h2>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    );
+    )
+
   }
 }
 

@@ -15,3 +15,6 @@ interpreter/new_model/output/distance_segment_angles_big
 interpreter/new_model/wandb
 
 data/
+*.npy
+data/
+share/

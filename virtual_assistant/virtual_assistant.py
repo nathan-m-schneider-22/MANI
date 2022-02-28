@@ -1,7 +1,7 @@
 import imp
 
 from numpy import short
-from .shortcuts import check_shortcut, get_shortcut_answer
+from .shortcuts import check_shortcut
 from .outsourced_assistant import call_outsourced_API
 import time
 # A virtual assistant class to handle VA functionality
@@ -12,16 +12,18 @@ class VirtualAssistant:
         self.display_instance = display
 
     def get_result(self, input):
+        print("Checking shortcut")
         shortcut = check_shortcut(input)
-        self.display_instance.display_query(shortcut)
+        self.display_instance.display_state("send", {"input": shortcut})
         self.display_instance.display_loading()
 
         if shortcut != None:
-            time.sleep(5)  # TAKE OUT IN FINAL VERSION
-            return get_shortcut_answer(input)
+            print("Found: ", shortcut)
             input = shortcut
-        time.sleep(5)  # TAKE OUT IN FINAL VERSION
+
         result = call_outsourced_API(input)
+        print("Result: ", result)
+        result = result[0].upper() + result[1:]
         return result
 
     def teardown(self):

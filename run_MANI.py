@@ -2,6 +2,7 @@ from interpreter.interpreter import Interpreter
 from display.display import Display
 from virtual_assistant.virtual_assistant import VirtualAssistant
 import argparse
+import time
 
 
 class MANI:
@@ -11,13 +12,17 @@ class MANI:
         self.virtual_assistant = VirtualAssistant(self.display)
 
     def main_loop(self):
+        self.display.display_state("sleep")
         while True:
             print("Starting Main Loop")
             self.interpreter.wait_for_input()
             self.display.display_reset()
             input = self.interpreter.capture_full_input()
-            result = self.virtual_assistant.get_result(input)
-            self.display.display_result(result)
+            if input != "":
+                result = self.virtual_assistant.get_result(input)
+                self.display.display_state("display", {"response": result})
+                self.display.display_result(result)
+                # time.sleep(5)
 
     def teardown(self):
         print("Tearing down")
@@ -30,8 +35,9 @@ def main(args):
     mani_instance = MANI(args)
     try:
         mani_instance.main_loop()
-    except:
+    except Exception as e:
         mani_instance.teardown()
+        raise(e)
 
 
 if __name__ == "__main__":
