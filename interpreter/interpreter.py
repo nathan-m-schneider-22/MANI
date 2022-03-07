@@ -36,13 +36,11 @@ class Interpreter:
         # interpreter sentence inference variables
         self.curr_letter = ''
         self.curr_input = ''
-        self.buffer_size = 5
+        self.buffer_size = 10
         self.buffer = ['*' for _ in range(self.buffer_size)]
 
 
         # interpreter sentence hyperparameters
-        self.alpha = .04
-        self.theta = .35
 
     def display_frame(self, frame):
         if frame is not None:
@@ -103,13 +101,13 @@ class Interpreter:
                                 self.curr_input += self.curr_letter
                             self.buffer = ['*' for _ in range(self.buffer_size)]
                            # self.display_instance.display_query(self.curr_input)
+                            self.display_instance.display_state(
+                                "save", {"input": self.curr_input})
 
                         #else:
                         #    self.curr_letter = ''
                         #    self.buffer =  ['*' for _ in range(2*self.buffer_size)]
 
-                        self.display_instance.display_state(
-                            "save", {"input": self.curr_input})
 
                     break
 
