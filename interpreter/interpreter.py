@@ -36,7 +36,7 @@ class Interpreter:
         # interpreter sentence inference variables
         self.curr_letter = ''
         self.curr_input = ''
-        self.buffer_size = 10
+        self.buffer_size = 20
         self.buffer = ['*' for _ in range(self.buffer_size)]
 
 
