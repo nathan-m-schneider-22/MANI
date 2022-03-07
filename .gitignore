@@ -18,3 +18,4 @@ data/
 *.npy
 data/
 share/
+.python-version
