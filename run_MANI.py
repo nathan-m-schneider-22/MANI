@@ -4,6 +4,7 @@ from interpreter.interpreter import Interpreter
 from display.display import Display
 from virtual_assistant.virtual_assistant import VirtualAssistant
 import interpreter.streamer as streamer
+import subprocess
 import argparse
 import time
 
@@ -11,6 +12,8 @@ import time
 class MANI:
     def __init__(self, args):
         self.display = Display(start_display=not args['run_logic'])
+        raspberry_ping = subprocess.run('find_raspberry_ip.sh', capture_output=True)
+        print(raspberry_ping.stdout)
         self.interpreter = Interpreter(self.display)
         self.virtual_assistant = VirtualAssistant(self.display,mock_va=bool(args['mock_va']))
 
