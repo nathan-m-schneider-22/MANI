@@ -70,12 +70,24 @@ class Interpreter:
             if results.multi_hand_landmarks:
 
                 for hand_landmarks in results.multi_hand_landmarks:
+                    # editting frame
+                    frame = self.frame_transform(frame)
+                    landmarks_style = self.mp_drawing_styles.get_default_hand_landmarks_style()
+                    for style in landmarks_style.values():
+                        style.color = (128, 64, 128)
+                        style.circle_radius = 0
+
+                    connections_style = self.mp_drawing_styles.get_default_hand_connections_style()
+                    for style in connections_style.values():
+                        style.color = (128, 64, 128)
+
                     self.mp_drawing.draw_landmarks(
                         frame,
                         hand_landmarks,
                         self.mp_hands.HAND_CONNECTIONS,
-                        self.mp_drawing_styles.get_default_hand_landmarks_style(),
-                        self.mp_drawing_styles.get_default_hand_connections_style())
+                        landmarks_style,
+                        connections_style)
+
 
                     # making prediction
                     features, _ = extract_features(
@@ -138,15 +150,23 @@ class Interpreter:
         while frame is None:
             frame = streamer.frame
             time.sleep(.1)
-            
-        self.display_frame(frame)
+        
+        disp_frame = self.frame_transform(frame)
+        self.display_frame(disp_frame)
 
         start_time = time.time()
         while not self.is_hand_in_frame(frame):
             frame = streamer.frame
-            self.display_frame(frame)
+            disp_frame = self.frame_transform(frame)
+            self.display_frame(disp_frame)
 
             # Captures the full sign input from the user, utilizes more complicated FSM logic
+    
+    def frame_transform(self, frame):
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2RGB)
+        return frame
+
     def capture_full_input(self):
         print("Capturing input")
         start_time = time.time()
