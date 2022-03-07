@@ -1,6 +1,7 @@
-import { Spinner } from "@geist-ui/react";
+import { Spinner, Image } from "@geist-ui/react";
 import React from "react";
 import loading from "./loading.gif";
+import maniLogo from "../../assets/mani_logo.png";
 import "./ssePage.scss";
 class sseRecieverPage extends React.Component {
   constructor(props) {
@@ -12,6 +13,7 @@ class sseRecieverPage extends React.Component {
       response: "",
       loading: false,
     };
+    this.history = [];
     this.ws = new WebSocket("ws://127.0.0.1:5001/");
   }
 
@@ -52,8 +54,10 @@ class sseRecieverPage extends React.Component {
           this.setState({
             input: data.input,
           });
+          this.history.push(this.input);
         }
         if (data.state === "display") {
+          this.history.push(this.response);
           this.setState({
             response: data.response,
           });
@@ -69,61 +73,72 @@ class sseRecieverPage extends React.Component {
     };
 
     return (
-      <div>
-        <h1 className="header"> Welcome to Project MANI</h1>
-        <div className="sse-page">
-          <div className="video-container">
-            <img src={"//127.0.0.1:5555/stream"} className="video" />
-          </div>
+      <div className="sse-page">
+        <div className="video-container">
+          <img src={"//127.0.0.1:5555/stream"} className="video" />
+        </div>
+        <div className="text_container">
+          <div className="input-response">
+            <div className="response-child">
+              {this.history.length > 0 && (
+                <div>
+                  {this.history.map((item, index) => {
+                    return (
+                      <iframe
+                        className="assistant-frame"
+                        title="MANI"
+                        srcdoc={item}
+                      ></iframe>
+                    );
+                  })}
+                </div>
+              )}
+              {this.state.fsm_state === "sleep" && (
+                <div>
+                  <h1>
+                    <span className="cursor">_</span>
+                  </h1>
+                  <h2>Hold your hand in the screen to start signing</h2>
+                </div>
+              )}
+              {this.state.fsm_state === "wait" && (
+                <div>
+                  <h1>
+                    {this.state.input}
+                    <span className="cursor">_</span>
+                  </h1>
+                  <h2> Hold you hand in the screen to start signing</h2>
+                </div>
+              )}
+              {this.state.fsm_state === "green" && (
+                <div>
+                  <h1>
+                    {this.state.input}
+                    <span className="cursor">_</span>
+                  </h1>
+                  <p className="top-letter">{this.state.top_letter}</p>
+                  {/* <h2>{this.state.response}</h2> */}
+                </div>
+              )}
+              {this.state.fsm_state === "save" && (
+                <div>
+                  <h1>
+                    {this.state.input}
+                    <span className="cursor">_</span>
+                  </h1>
 
-          <div className="text_container">
-            {this.state.fsm_state === "sleep" && (
-              <div>
-                <h1>
-                  <span className="cursor">_</span>
-                </h1>
-                <h2>Hold your hand in the screen to start signing</h2>
-              </div>
-            )}
-            {this.state.fsm_state === "wait" && (
-              <div>
-                <h1>
-                  {this.state.input}
-                  <span className="cursor">_</span>
-                </h1>
-                <h2> Hold you hand in the screen to start signing</h2>
-              </div>
-            )}
-            {this.state.fsm_state === "green" && (
-              <div>
-                <h1>
-                  {this.state.input}
-                  <span className="cursor">_</span>
-                </h1>
-                <p className="top-letter">{this.state.top_letter}</p>
-                {/* <h2>{this.state.response}</h2> */}
-              </div>
-            )}
-            {this.state.fsm_state === "save" && (
-              <div>
-                <h1>
-                  {this.state.input}
-                  <span className="cursor">_</span>
-                </h1>
+                  {/* <h2>{this.state.response}</h2> */}
+                </div>
+              )}
+              {this.state.fsm_state === "send" && (
+                <div>
+                  <h1>{this.state.input}</h1>
+                  <br />
 
-                {/* <h2>{this.state.response}</h2> */}
-              </div>
-            )}
-            {this.state.fsm_state === "send" && (
-              <div>
-                <h1>{this.state.input}</h1>
-                <br />
-
-                <Spinner className="spinner" style={{ margin: "auto" }} />
-              </div>
-            )}
-            {this.state.fsm_state === "display" && (
-              <div>
+                  <Spinner className="spinner" style={{ margin: "auto" }} />
+                </div>
+              )}
+              {this.state.fsm_state === "display" && (
                 <div>
                   <h2>{this.state.input}</h2>
                   {/* <h2>{this.state.response}</h2> */}
@@ -135,8 +150,9 @@ class sseRecieverPage extends React.Component {
                     ></iframe>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+              <div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -145,3 +161,4 @@ class sseRecieverPage extends React.Component {
 }
 
 export default sseRecieverPage;
+/*<img className="logo" src={maniLogo} />*/
