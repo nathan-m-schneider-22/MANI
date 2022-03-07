@@ -1,61 +1,74 @@
 import { Spinner } from "@geist-ui/react";
-import React, { useState, useRef } from "react";
+import React from "react";
 import loading from "./loading.gif";
 import "./ssePage.scss";
+class sseRecieverPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      query: "",
+      input: "",
+      fsm_state: "sleep",
+      response: "",
+      loading: false,
+    };
+    this.ws = new WebSocket("ws://127.0.0.1:5001/");
+  }
 
-export default function SseRecieverPage(props) {
-  const [input, setInput] = useState("");
-  const [fsmState, setFsmState] = useState("sleep");
-  const [response, setResponse] = useState("sleep");
-  const [loading, setLoading] = useState(false);
-  const [topLetter, setTopLetter] = useState("");
-  const [secondLetter, setSecondLetter] = useState("");
-  const [currentData, setCurrentData] = useState();
+  render() {
+    this.ws.onopen = () => {
+      console.log("Opened Connection!");
+    };
 
-  const ws = useRef(new WebSocket("ws://127.0.0.1:5001/"));
-
-  ws.current.onopen = () => {
-    console.log("Opened Connection!");
-  };
-
-  ws.current.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    if (data.message_type === "state") {
-      setFsmState(data.state);
-      switch (data.state) {
-        case "sleep":
-          setInput("");
-          break;
-        case "green":
-          setTopLetter(data.letter);
-          break;
-        case "yellow":
-          setTopLetter(data.letters[0]);
-          setSecondLetter(data.letters[1]);
-          break;
-        case "save":
-          setInput(data.input);
-          break;
-        case "send":
-          setInput(data.input);
-          break;
-        case "display":
-          setResponse(data.response);
-          break;
-        default:
-          console.log("invalid state");
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      // console.log(data)
+      if (data.message_type === "state") {
+        this.setState({
+          fsm_state: data.state,
+        });
+        if (data.state === "sleep") {
+          this.setState({
+            input: "",
+          });
+        }
+        if (data.state === "green") {
+          this.setState({
+            top_letter: data.letter,
+          });
+        }
+        if (data.state === "yellow") {
+          this.setState({
+            top_letter: data.letters[0],
+            second_letter: data.letters[1],
+          });
+        }
+        if (data.state === "save") {
+          this.setState({
+            input: data.input,
+          });
+        }
+        if (data.state === "send") {
+          this.setState({
+            input: data.input,
+          });
+        }
+        if (data.state === "display") {
+          this.setState({
+            response: data.response,
+          });
+        }
       }
-      setCurrentData(JSON.parse(event.data));
-      console.log(currentData);
-    }
-  };
 
-  ws.current.onclose = () => {
-    console.log("Closed Connection!");
-  };
+      this.setState({ currentData: JSON.parse(event.data) });
+      console.log(this.state);
+    };
 
-  return (
-    <>
+    this.ws.onclose = () => {
+      console.log("Closed Connection!");
+    };
+
+    return (
       <div>
         <h1 className="header"> Welcome to Project MANI</h1>
         <div className="sse-page">
@@ -64,7 +77,7 @@ export default function SseRecieverPage(props) {
           </div>
 
           <div className="text_container">
-            {fsmState === "sleep" && (
+            {this.state.fsm_state === "sleep" && (
               <div>
                 <h1>
                   <span className="cursor">_</span>
@@ -72,53 +85,53 @@ export default function SseRecieverPage(props) {
                 <h2>Hold your hand in the screen to start signing</h2>
               </div>
             )}
-            {fsmState === "wait" && (
+            {this.state.fsm_state === "wait" && (
               <div>
                 <h1>
-                  {input}
+                  {this.state.input}
                   <span className="cursor">_</span>
                 </h1>
                 <h2> Hold you hand in the screen to start signing</h2>
               </div>
             )}
-            {fsmState === "green" && (
+            {this.state.fsm_state === "green" && (
               <div>
                 <h1>
-                  {input}
+                  {this.state.input}
                   <span className="cursor">_</span>
                 </h1>
-                <p className="top-letter">{topLetter}</p>
-                {/*<h2>{response}</h2>*/}
+                <p className="top-letter">{this.state.top_letter}</p>
+                {/* <h2>{this.state.response}</h2> */}
               </div>
             )}
-            {fsmState === "save" && (
+            {this.state.fsm_state === "save" && (
               <div>
                 <h1>
-                  {input}
+                  {this.state.input}
                   <span className="cursor">_</span>
                 </h1>
 
-                {/*<h2>{response}</h2>*/}
+                {/* <h2>{this.state.response}</h2> */}
               </div>
             )}
-            {fsmState === "send" && (
+            {this.state.fsm_state === "send" && (
               <div>
-                <h1>{input}</h1>
+                <h1>{this.state.input}</h1>
                 <br />
 
                 <Spinner className="spinner" style={{ margin: "auto" }} />
               </div>
             )}
-            {fsmState === "display" && (
+            {this.state.fsm_state === "display" && (
               <div>
                 <div>
-                  <h2>{input}</h2>
-                  {/* <h2>{response}</h2> */}
+                  <h2>{this.state.input}</h2>
+                  {/* <h2>{this.state.response}</h2> */}
                   <div>
                     <iframe
                       className="assistant-frame"
                       title="MANI"
-                      srcdoc={response}
+                      srcdoc={this.state.response}
                     ></iframe>
                   </div>
                 </div>
@@ -127,6 +140,8 @@ export default function SseRecieverPage(props) {
           </div>
         </div>
       </div>
-    </>
-  );
+    );
+  }
 }
+
+export default sseRecieverPage;
