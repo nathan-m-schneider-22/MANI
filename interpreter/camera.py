@@ -16,10 +16,14 @@ class Camera:
 
     # Capture the current frame and transform it as needed
     def capture_image(self):
-        ret, frame = self.cap.read()
-        frame = cv2.flip(frame, 1)
+        try:
+            ret, frame = self.cap.read()
+            frame = cv2.flip(frame, 1)
 
-        return frame
+            return frame
+        except:
+            print('capturing frame failed')
+            return None
 
     # Release the components utilized by the camera
     def teardown(self):
