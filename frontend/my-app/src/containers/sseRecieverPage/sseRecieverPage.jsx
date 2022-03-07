@@ -94,14 +94,14 @@ class sseRecieverPage extends React.Component {
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
                   <p className='top-letter'>{this.state.top_letter}</p>
-                  <h2>{this.state.response}</h2>
+                  {/* <h2>{this.state.response}</h2> */}
                 </div>
               )}
               {this.state.fsm_state === "save" && (
                 <div>
                   <h1>{this.state.input}<span className='cursor'>_</span></h1>
 
-                  <h2>{this.state.response}</h2>
+                  {/* <h2>{this.state.response}</h2> */}
                 </div>
               )}
               {this.state.fsm_state === "send" && (
