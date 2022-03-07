@@ -34,14 +34,13 @@ class Interpreter:
             min_tracking_confidence=0.5)
 
         # interpreter sentence inference variables
-        self.state = np.array([1/26 for _ in range(26)])
         self.curr_letter = ''
         self.curr_input = ''
-        self.start_time = time.time()
+        self.buffer_size = 10
+        self.buffer = ['*' for _ in range(self.buffer_size)]
+
 
         # interpreter sentence hyperparameters
-        self.alpha = .04
-        self.theta = .35
 
     def display_frame(self, frame):
         if frame is not None:
@@ -82,26 +81,33 @@ class Interpreter:
                     features, _ = extract_features(
                         [hand_landmarks], ['a'], input_type='inference')
                     preds = self.model.predict_proba(features)
-                    self.state = self.state + self.alpha*(preds-self.state)
-                    pred = self.model.classes_[np.argmax(self.state)]
+                    
+                    cp = self.model.classes_[np.argmax(preds)]
+                    self.buffer.pop(0)
+                    self.buffer.append(cp)
                     self.display_instance.display_state(
-                        'green', {"letter": pred, "input": self.curr_input})
-                    if pred == '_':
-                        pred = ' '
-                    if time.time()-self.start_time > 3 and np.max(self.state) > .35:
-                        if self.curr_letter != pred:
-                            self.curr_letter = pred
+                        'green', {"letter": cp, "input": self.curr_input})
 
+                    if cp == '_':
+                        cp = ' ' 
+
+                    if all(x == self.buffer[0] for x in self.buffer):
+                        if self.curr_letter != cp:
+                            self.curr_letter = cp
                             if self.curr_letter == 'x':
                                 self.curr_input = self.curr_input[:-1]
                                 self.curr_letter = ''
-                                self.start_time = time.time()
                             else:
-                                self.curr_input += pred
-
+                                self.curr_input += self.curr_letter
+                            self.buffer = ['*' for _ in range(self.buffer_size)]
+                           # self.display_instance.display_query(self.curr_input)
                             self.display_instance.display_state(
                                 "save", {"input": self.curr_input})
-                            self.display_instance.display_query(self.curr_input)
+
+                        #else:
+                        #    self.curr_letter = ''
+                        #    self.buffer =  ['*' for _ in range(2*self.buffer_size)]
+
 
                     break
 
