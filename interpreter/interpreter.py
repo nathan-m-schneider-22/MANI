@@ -87,6 +87,8 @@ class Interpreter:
                     cp = self.model.classes_[np.argmax(preds)]
                     self.buffer.pop(0)
                     self.buffer.append(cp)
+                    self.display_instance.display_state(
+                        'green', {"letter": cp, "input": self.curr_input})
 
                     if cp == '_':
                         cp = ' ' 
@@ -100,13 +102,14 @@ class Interpreter:
                             else:
                                 self.curr_input += self.curr_letter
                             self.buffer = ['*' for _ in range(self.buffer_size)]
+                           # self.display_instance.display_query(self.curr_input)
+
                         #else:
                         #    self.curr_letter = ''
                         #    self.buffer =  ['*' for _ in range(2*self.buffer_size)]
 
                         self.display_instance.display_state(
                             "save", {"input": self.curr_input})
-                        self.display_instance.display_query(self.curr_input)
 
                     break
 
