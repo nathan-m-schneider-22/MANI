@@ -88,7 +88,7 @@ export default function SseRecieverPage(props) {
                   <span className="cursor">_</span>
                 </h1>
                 <p className="top-letter">{topLetter}</p>
-                <h2>{response}</h2>
+                {/*<h2>{response}</h2>*/}
               </div>
             )}
             {fsmState === "save" && (
@@ -98,7 +98,7 @@ export default function SseRecieverPage(props) {
                   <span className="cursor">_</span>
                 </h1>
 
-                <h2>{response}</h2>
+                {/*<h2>{response}</h2>*/}
               </div>
             )}
             {fsmState === "send" && (
