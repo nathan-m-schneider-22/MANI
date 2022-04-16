@@ -6,6 +6,7 @@ from virtual_assistant.virtual_assistant import VirtualAssistant
 import interpreter.streamer as streamer
 import argparse
 import time
+import logging
 
 
 class MANI:

@@ -1,24 +1,24 @@
 from turtle import update
+
 from .camera import Camera
+from statistics import median
+import math
 import cv2
 import time
 import numpy as np
 import random
 import mediapipe as mp
 
+import interpreter.constants as constants
+
 from joblib import load
 from . import streamer
 from .new_model.preprocess.feature_extractor import extract_features
 
 # Interpreter class to parse images into signs, and build signs
-
-FRAME_RATE = 30
-YELLOW_ACC_THRESHOLD = .8
-
 class Interpreter:
     def __init__(self, display_instance):
         self.display_instance = display_instance
-        # self.camera = Camera()
         checkpoint_path = "./interpreter/new_model/output/model.joblib"
         self.model = load(checkpoint_path)
 
@@ -29,45 +29,52 @@ class Interpreter:
         self.mp_drawing = mp.solutions.drawing_utils
 
         self.hands = self.mp_hands.Hands(
-            model_complexity=0,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5)
+            model_complexity=constants.MODEL_COMPLEXITY,
+            min_detection_confidence=constants.MIN_DETECTION_CONFIDENCE,
+            min_tracking_confidence=constants.MIN_TRACKING_CONFIDENCE)
 
         # interpreter sentence inference variables
         self.curr_letter = ''
         self.curr_input = ''
-        self.buffer_size = 20
-        self.buffer = ['*' for _ in range(self.buffer_size)]
 
+        self.med_delta_time = constants.INITIAL_TIME
+        self.time_buffer = []
+        self.prev_time = time.time()
 
-        # interpreter sentence hyperparameters
+        self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
 
     def display_frame(self, frame):
         if frame is not None:
             with streamer.lock:
                 streamer.outputFrame = frame.copy()
-        # frame = cv2.resize(frame, (480, 360))                # Resize image
-        # cv2.imshow('frame', frame)
-        # cv2.moveWindow('frame', 30, 80)
-        # cv2.setWindowProperty('frame', cv2.WND_PROP_TOPMOST, 1)
-
-        # k = cv2.waitKey(1)
-        # if k % 256 == 27:
-        #     print("Escape hit, closing...")
-        #     exit(0)
 
     # Parses the current frame from ASL to a letter
     def parse_frame(self):
-        # frame = self.camera.capture_image()
         frame = streamer.frame
         if frame is not None:
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-            result = 'no hand'
             results = self.hands.process(frame)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             if results.multi_hand_landmarks:
+
+                curr_time = time.time()
+                delta_time = curr_time-self.prev_time
+                self.time_buffer.append(delta_time)
+                self.prev_time = curr_time
+
+                if len(self.time_buffer) > constants.TIME_LOOKBACK:
+                    self.time_buffer.pop(0)
+                    self.med_delta_time = median(self.time_buffer)
+                
+                match_size = int(math.floor(constants.TIME_PER_SIGN/self.med_delta_time))
+                match_size = max(min((match_size, constants.MAX_BUFFER_SIZE)), constants.MIN_BUFFER_SIZE)
+
+                print("iter k")
+                print(delta_time)
+                print(self.med_delta_time)
+                print(match_size)
 
                 for hand_landmarks in results.multi_hand_landmarks:
                     self.mp_drawing.draw_landmarks(
@@ -91,7 +98,7 @@ class Interpreter:
                     if cp == '_':
                         cp = ' ' 
 
-                    if all(x == self.buffer[0] for x in self.buffer):
+                    if all(x == self.buffer[-1] for x in self.buffer[-match_size:]):
                         if self.curr_letter != cp:
                             self.curr_letter = cp
                             if self.curr_letter == 'x':
@@ -99,31 +106,21 @@ class Interpreter:
                                 self.curr_letter = ''
                             else:
                                 self.curr_input += self.curr_letter
-                            self.buffer = ['*' for _ in range(self.buffer_size)]
-                           # self.display_instance.display_query(self.curr_input)
+                            self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+
                             self.display_instance.display_state(
                                 "save", {"input": self.curr_input})
-
-                        #else:
-                        #    self.curr_letter = ''
-                        #    self.buffer =  ['*' for _ in range(2*self.buffer_size)]
-
 
                     break
 
             self.display_frame(frame)
             if results.multi_hand_landmarks == None:
-                print("FINISHE")
-                state = np.array([1/26 for _ in range(26)])
                 self.curr_letter = ""
                 self.start_time = time.time()
-                pred = 'clear'
-
                 self.display_instance.display_query(self.curr_input)
                 self.input_finished = 1
 
     # Wait for a user to initiate an input, returns when the user is about to give an input, runs on FSM
-
     def is_hand_in_frame(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.hands.process(frame)
@@ -146,7 +143,7 @@ class Interpreter:
             frame = streamer.frame
             self.display_frame(frame)
 
-            # Captures the full sign input from the user, utilizes more complicated FSM logic
+    # Captures the full sign input from the user, utilizes more complicated FSM logic
     def capture_full_input(self):
         print("Capturing input")
         start_time = time.time()

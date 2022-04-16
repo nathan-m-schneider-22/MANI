@@ -1,5 +1,3 @@
-import time
-
 shortcuts = {"bc": "What is the news from the BBC?",
              "wh": "What is the weather in Hanover, New Hampshire?",
              "poki": "How many pounds in a kilogram?",
@@ -18,7 +16,8 @@ shortcuts = {"bc": "What is the news from the BBC?",
 
 
 def check_shortcut(input):
-    if input.lower() in shortcuts.keys():
+    input = input.lower()
+    if input in shortcuts.keys():
         return shortcuts[input]
     else:
         return None

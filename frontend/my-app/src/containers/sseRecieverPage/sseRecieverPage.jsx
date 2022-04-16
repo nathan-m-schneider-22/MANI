@@ -1,8 +1,9 @@
-import { Spinner, Image } from "@geist-ui/react";
+import { Spinner } from "@geist-ui/react";
 import React from "react";
 import loading from "./loading.gif";
-import maniLogo from "../../assets/mani_logo.png";
+import * as Constants from "../../constants";
 import "./ssePage.scss";
+
 class sseRecieverPage extends React.Component {
   constructor(props) {
     super(props);
@@ -13,8 +14,7 @@ class sseRecieverPage extends React.Component {
       response: "",
       loading: false,
     };
-    this.history = [];
-    this.ws = new WebSocket("ws://127.0.0.1:5001/");
+    this.ws = new WebSocket(Constants.WEB_SOCKET);
   }
 
   render() {
@@ -25,39 +25,37 @@ class sseRecieverPage extends React.Component {
     this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // console.log(data)
-      if (data.message_type === "state") {
+      if (data.message_type === Constants.MESSAGE_TYPE) {
         this.setState({
           fsm_state: data.state,
         });
-        if (data.state === "sleep") {
+        if (data.state === Constants.FSM_SLEEP) {
           this.setState({
             input: "",
           });
         }
-        if (data.state === "green") {
+        if (data.state === Constants.FSM_GREEN) {
           this.setState({
             top_letter: data.letter,
           });
         }
-        if (data.state === "yellow") {
+        if (data.state === Constants.FSM_YELLOW) {
           this.setState({
             top_letter: data.letters[0],
             second_letter: data.letters[1],
           });
         }
-        if (data.state === "save") {
+        if (data.state === Constants.FSM_SAVE) {
           this.setState({
             input: data.input,
           });
         }
-        if (data.state === "send") {
+        if (data.state === Constants.FSM_SEND) {
           this.setState({
             input: data.input,
           });
-          this.history.push(this.input);
         }
-        if (data.state === "display") {
-          this.history.push(this.response);
+        if (data.state === Constants.FSM_DISPLAY) {
           this.setState({
             response: data.response,
           });
@@ -73,72 +71,61 @@ class sseRecieverPage extends React.Component {
     };
 
     return (
-      <div className="sse-page">
-        <div className="video-container">
-          <img src={"//127.0.0.1:5555/stream"} className="video" />
-        </div>
-        <div className="text_container">
-          <div className="input-response">
-            <div className="response-child">
-              {this.history.length > 0 && (
-                <div>
-                  {this.history.map((item, index) => {
-                    return (
-                      <iframe
-                        className="assistant-frame"
-                        title="MANI"
-                        srcdoc={item}
-                      ></iframe>
-                    );
-                  })}
-                </div>
-              )}
-              {this.state.fsm_state === "sleep" && (
-                <div>
-                  <h1>
-                    <span className="cursor">_</span>
-                  </h1>
-                  <h2>Hold your hand in the screen to start signing</h2>
-                </div>
-              )}
-              {this.state.fsm_state === "wait" && (
-                <div>
-                  <h1>
-                    {this.state.input}
-                    <span className="cursor">_</span>
-                  </h1>
-                  <h2> Hold you hand in the screen to start signing</h2>
-                </div>
-              )}
-              {this.state.fsm_state === "green" && (
-                <div>
-                  <h1>
-                    {this.state.input}
-                    <span className="cursor">_</span>
-                  </h1>
-                  <p className="top-letter">{this.state.top_letter}</p>
-                  {/* <h2>{this.state.response}</h2> */}
-                </div>
-              )}
-              {this.state.fsm_state === "save" && (
-                <div>
-                  <h1>
-                    {this.state.input}
-                    <span className="cursor">_</span>
-                  </h1>
+      <div>
+        <h1 className="header"> Welcome to Project MANI</h1>
+        <div className="sse-page">
+          <div className="video-container">
+            <img src={Constants.STREAM_URL} className="video" />
+          </div>
 
-                  {/* <h2>{this.state.response}</h2> */}
-                </div>
-              )}
-              {this.state.fsm_state === "send" && (
-                <div>
-                  <h1>{this.state.input}</h1>
-                  <br />
+          <div className="text_container">
+            {this.state.fsm_state === Constants.FSM_SLEEP && (
+              <div>
+                <h1>
+                  <span className="cursor">_</span>
+                </h1>
+                <h2>Hold your hand in the screen to start signing</h2>
+              </div>
+            )}
+            {this.state.fsm_state === Constants.FSM_WAIT && (
+              <div>
+                <h1>
+                  {this.state.input}
+                  <span className="cursor">_</span>
+                </h1>
+                <h2> Hold you hand in the screen to start signing</h2>
+              </div>
+            )}
+            {this.state.fsm_state === Constants.FSM_GREEN && (
+              <div>
+                <h1>
+                  {this.state.input}
+                  <span className="cursor">_</span>
+                </h1>
+                <p className="top-letter">{this.state.top_letter}</p>
+                {/* <h2>{this.state.response}</h2> */}
+              </div>
+            )}
+            {this.state.fsm_state === Constants.FSM_SAVE && (
+              <div>
+                <h1>
+                  {this.state.input}
+                  <span className="cursor">_</span>
+                </h1>
 
-                  <Spinner className="spinner" style={{ margin: "auto" }} />
-                </div>
-              )}
-              {this.state.fsm_state === "display" && (
+                {/* <h2>{this.state.response}</h2> */}
+              </div>
+            )}
+            {this.state.fsm_state === Constants.FSM_SEND && (
+              <div>
+                <h1>{this.state.input}</h1>
+                <br />
+
+                <Spinner className="spinner" style={{ margin: "auto" }} />
+              </div>
+            )}
+            {this.state.fsm_state === Constants.FSM_DISPLAY && (
+              <div>
                 <div>
                   <h2>{this.state.input}</h2>
                   {/* <h2>{this.state.response}</h2> */}
@@ -150,9 +137,8 @@ class sseRecieverPage extends React.Component {
                     ></iframe>
                   </div>
                 </div>
-              )}
-              <div></div>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -161,4 +147,3 @@ class sseRecieverPage extends React.Component {
 }
 
 export default sseRecieverPage;
-/*<img className="logo" src={maniLogo} />*/
