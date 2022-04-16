@@ -3,12 +3,13 @@ import imp
 from numpy import short
 from .shortcuts import check_shortcut
 from .outsourced_assistant import call_outsourced_API
+from display.display import Display
 import time
 # A virtual assistant class to handle VA functionality
 
 
 class VirtualAssistant:
-    def __init__(self, display,mock_va = False):
+    def __init__(self, display: Display, mock_va: bool = False):
         self.display_instance = display
         self.mock_va = mock_va
 
