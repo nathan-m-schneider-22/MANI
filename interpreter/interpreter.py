@@ -8,16 +8,18 @@ import time
 import numpy as np
 import random
 import mediapipe as mp
+import numpy.typing as npt
 
 import interpreter.constants as constants
 
 from joblib import load
 from . import streamer
 from .new_model.preprocess.feature_extractor import extract_features
+from display.display import Display
 
 # Interpreter class to parse images into signs, and build signs
 class Interpreter:
-    def __init__(self, display_instance):
+    def __init__(self, display_instance: Display):
         self.display_instance = display_instance
         checkpoint_path = "./interpreter/new_model/output/model.joblib"
         self.model = load(checkpoint_path)
@@ -43,7 +45,7 @@ class Interpreter:
 
         self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
 
-    def display_frame(self, frame):
+    def display_frame(self, frame: npt.NDArray):
         if frame is not None:
             with streamer.lock:
                 streamer.outputFrame = frame.copy()
@@ -70,11 +72,6 @@ class Interpreter:
                 
                 match_size = int(math.floor(constants.TIME_PER_SIGN/self.med_delta_time))
                 match_size = max(min((match_size, constants.MAX_BUFFER_SIZE)), constants.MIN_BUFFER_SIZE)
-
-                print("iter k")
-                print(delta_time)
-                print(self.med_delta_time)
-                print(match_size)
 
                 for hand_landmarks in results.multi_hand_landmarks:
                     self.mp_drawing.draw_landmarks(
@@ -121,7 +118,7 @@ class Interpreter:
                 self.input_finished = 1
 
     # Wait for a user to initiate an input, returns when the user is about to give an input, runs on FSM
-    def is_hand_in_frame(self, frame):
+    def is_hand_in_frame(self, frame: npt.NDArray):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         results = self.hands.process(frame)
         hand_in_frame = results.multi_hand_landmarks != None

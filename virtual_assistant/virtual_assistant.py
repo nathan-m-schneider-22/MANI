@@ -13,7 +13,7 @@ class VirtualAssistant:
         self.mock_va = mock_va
 
 
-    def get_result(self, input):
+    def get_result(self, input: str):
         print("Checking shortcut")
         shortcut = check_shortcut(input)
         self.display_instance.display_loading()
