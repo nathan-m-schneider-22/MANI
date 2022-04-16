@@ -1,18 +1,15 @@
 .sse-page {
     display: flex;
     flex-direction: row;
-    height: 100%;
     .video-container {
-        flex: 1;
+        margin: 40px;
         border-style: solid;
-        border-width: 0px;
+        border-width: 6px;
         justify-content: center;
         align-items: center;
     }
     .video {
         width: 100%;
-        object-fit: cover;
-        height: 100%;
     }
     .top-letter {
         font-size: 48px;
@@ -51,20 +48,10 @@
 }
 
 .text_container {
-    flex: 1;
     margin: 40px;
     display: flex;
-    flex-direction: column;
-    .logo {
-        flex: 1;
-    }
-    .input-response {
-        flex: 15;
-        display: flex;
-        .response-child {
-            align-self: end;
-        }
-    }
+    flex-direction: row;
+    width: 50%;
 }
 
 .spinner {
