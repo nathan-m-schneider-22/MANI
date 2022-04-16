@@ -41,6 +41,7 @@ class Interpreter:
 
         self.med_delta_time = constants.INITIAL_TIME
         self.time_buffer = []
+        self.match_size = self.compute_match_size()
         self.prev_time = time.time()
 
         self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
@@ -55,67 +56,90 @@ class Interpreter:
         frame = streamer.frame
         if frame is not None:
 
+            # convert frame to RGB for processing
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
             results = self.hands.process(frame)
+
+            # convert frame back to BGR for display 
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+
+            # if hand detected
             if results.multi_hand_landmarks:
+                # update match size value based on frame rate
+                self.update_match_size()
 
-                curr_time = time.time()
-                delta_time = curr_time-self.prev_time
-                self.time_buffer.append(delta_time)
-                self.prev_time = curr_time
+                # get current hand landmarks
+                hand_landmarks = results.multi_hand_landmarks[0]
 
-                if len(self.time_buffer) > constants.TIME_LOOKBACK:
-                    self.time_buffer.pop(0)
-                    self.med_delta_time = median(self.time_buffer)
+                # draw landmarks on top of frame
+                self.mp_drawing.draw_landmarks(
+                    frame,
+                    hand_landmarks,
+                    self.mp_hands.HAND_CONNECTIONS,
+                    self.mp_drawing_styles.get_default_hand_landmarks_style(),
+                    self.mp_drawing_styles.get_default_hand_connections_style())
+
+                # making prediction
+                features, _ = extract_features(
+                    [hand_landmarks], ['a'], input_type='inference')
+                preds = self.model.predict_proba(features)
                 
-                match_size = int(math.floor(constants.TIME_PER_SIGN/self.med_delta_time))
-                match_size = max(min((match_size, constants.MAX_BUFFER_SIZE)), constants.MIN_BUFFER_SIZE)
+                cp = self.model.classes_[np.argmax(preds)]
 
-                for hand_landmarks in results.multi_hand_landmarks:
-                    self.mp_drawing.draw_landmarks(
-                        frame,
-                        hand_landmarks,
-                        self.mp_hands.HAND_CONNECTIONS,
-                        self.mp_drawing_styles.get_default_hand_landmarks_style(),
-                        self.mp_drawing_styles.get_default_hand_connections_style())
+                # update buffer
+                self.buffer.pop(0)
+                self.buffer.append(cp)
 
-                    # making prediction
-                    features, _ = extract_features(
-                        [hand_landmarks], ['a'], input_type='inference')
-                    preds = self.model.predict_proba(features)
-                    
-                    cp = self.model.classes_[np.argmax(preds)]
-                    self.buffer.pop(0)
-                    self.buffer.append(cp)
-                    self.display_instance.display_state(
-                        'green', {"letter": cp, "input": self.curr_input})
+                # send current input to the display 
+                self.display_instance.display_state(
+                    'green', {"letter": cp, "input": self.curr_input})
 
-                    if cp == '_':
-                        cp = ' ' 
+                # convert '_' output to space
+                if cp == '_':
+                    cp = ' ' 
 
-                    if all(x == self.buffer[-1] for x in self.buffer[-match_size:]):
-                        if self.curr_letter != cp:
-                            self.curr_letter = cp
-                            if self.curr_letter == 'x':
-                                self.curr_input = self.curr_input[:-1]
-                                self.curr_letter = ''
-                            else:
-                                self.curr_input += self.curr_letter
-                            self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
-
-                            self.display_instance.display_state(
-                                "save", {"input": self.curr_input})
-
-                    break
+                # if we've seen cp self.match_size times in a row, add it
+                if all(x == self.buffer[-1] for x in self.buffer[-self.match_size:]):
+                    if self.curr_letter != cp:
+                        self.add_letter(cp)
 
             self.display_frame(frame)
+
             if results.multi_hand_landmarks == None:
                 self.curr_letter = ""
-                self.start_time = time.time()
                 self.display_instance.display_query(self.curr_input)
                 self.input_finished = 1
+
+    # Add letter to input query and display it
+    def add_letter(self, cp: str):
+        self.curr_letter = cp
+        if self.curr_letter == 'x':
+            self.curr_input = self.curr_input[:-1]
+            self.curr_letter = ''
+        else:
+            self.curr_input += self.curr_letter
+        self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+
+        self.display_instance.display_state(
+            "save", {"input": self.curr_input})
+
+    # Dynamically adjust buffer size based on frame rate
+    def update_match_size(self):
+        curr_time = time.time()
+        delta_time = curr_time-self.prev_time
+        self.time_buffer.append(delta_time)
+        self.prev_time = curr_time
+
+        if len(self.time_buffer) > constants.TIME_LOOKBACK:
+            self.time_buffer.pop(0)
+            self.med_delta_time = median(self.time_buffer)
+        
+        self.compute_match_size()
+
+    def compute_match_size(self):
+        match_size = int(math.floor(constants.TIME_PER_SIGN/self.med_delta_time))
+        self.match_size = max(min((match_size, constants.MAX_BUFFER_SIZE)), constants.MIN_BUFFER_SIZE)
+
 
     # Wait for a user to initiate an input, returns when the user is about to give an input, runs on FSM
     def is_hand_in_frame(self, frame: npt.NDArray):
