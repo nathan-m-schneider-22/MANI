@@ -143,7 +143,6 @@ class Interpreter:
     # Captures the full sign input from the user, utilizes more complicated FSM logic
     def capture_full_input(self):
         print("Capturing input")
-        start_time = time.time()
         self.curr_letter = ''
         self.curr_input = ''
         self.input_finished = 0
