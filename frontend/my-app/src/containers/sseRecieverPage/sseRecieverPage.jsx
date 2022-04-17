@@ -84,7 +84,7 @@ class sseRecieverPage extends React.Component {
                 <h1>
                   <span className="cursor">_</span>
                 </h1>
-                <h2>Hold your hand in the screen to start signing</h2>
+                <h2>Sign "hello" to start input</h2>
               </div>
             )}
             {this.state.fsm_state === Constants.FSM_WAIT && (
