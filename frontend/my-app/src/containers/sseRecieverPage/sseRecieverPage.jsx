@@ -12,6 +12,7 @@ class sseRecieverPage extends React.Component {
       fsm_state: "sleep",
       response: "",
       loading: false,
+      hand: "left",
     };
     this.history = [];
     this.ws = new WebSocket("ws://127.0.0.1:5001/");
@@ -32,6 +33,11 @@ class sseRecieverPage extends React.Component {
         if (data.state === "sleep") {
           this.setState({
             input: "",
+          });
+        }
+        if (data.state === "hand") {
+          this.setState({
+            hand: data.hand,
           });
         }
         if (data.state === "green") {
@@ -74,9 +80,11 @@ class sseRecieverPage extends React.Component {
 
     return (
       <div className="sse-page">
-        <div className="video-container">
-          <img src={"//127.0.0.1:5555/stream"} className="video" />
-        </div>
+        {this.state.hand === "left" && (
+          <div className="video-container">
+            <img src={"//127.0.0.1:5555/stream"} className="video" />
+          </div>
+        )}
         <div className="text_container">
           <div className="input-response">
             <div className="response-child">
@@ -155,6 +163,11 @@ class sseRecieverPage extends React.Component {
             </div>
           </div>
         </div>
+        {this.state.hand === "right" && (
+          <div className="video-container">
+            <img src={"//127.0.0.1:5555/stream"} className="video" />
+          </div>
+        )}
       </div>
     );
   }

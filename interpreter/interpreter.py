@@ -30,14 +30,15 @@ class Interpreter:
 
         self.hands = self.mp_hands.Hands(
             model_complexity=0,
-            min_detection_confidence=0.5,
-            min_tracking_confidence=0.5)
+            min_detection_confidence=0.8,
+            min_tracking_confidence=0.6)
 
         # interpreter sentence inference variables
         self.curr_letter = ''
         self.curr_input = ''
-        self.buffer_size = 20
+        self.buffer_size = 10
         self.buffer = ['*' for _ in range(self.buffer_size)]
+        self.hand_assigned = False
 
 
         # interpreter sentence hyperparameters
@@ -68,6 +69,13 @@ class Interpreter:
             results = self.hands.process(frame)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             if results.multi_hand_landmarks:
+                if not self.hand_assigned:
+                    for hand in results.multi_handedness:
+                        handType=hand.classification[0].label
+                        self.display_instance.display_state(
+                            'hand', {"hand": handType.lower()})
+                        break
+                    self.hand_assigned = True
 
                 for hand_landmarks in results.multi_hand_landmarks:
                     # editting frame
@@ -129,6 +137,7 @@ class Interpreter:
                 state = np.array([1/26 for _ in range(26)])
                 self.curr_letter = ""
                 self.start_time = time.time()
+                self.hand_assigned = False
                 pred = 'clear'
 
                 self.display_instance.display_query(self.curr_input)
