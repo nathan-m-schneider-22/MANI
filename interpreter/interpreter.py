@@ -102,6 +102,7 @@ class Interpreter:
                 self.buffer.append(cp)
 
                 # making sequence prediction
+                """
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
                     seq_features = np.array(self.feature_buffer)
                     seq_features = np.reshape(seq_features, seq_features.size).reshape(1, -1)
@@ -116,6 +117,7 @@ class Interpreter:
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
                     self.feature_buffer.pop(0)
                 self.feature_buffer.append(features)
+                """
 
                 # send current input to the display 
                 self.display_instance.display_state(
@@ -129,24 +131,27 @@ class Interpreter:
                 if all(x == self.buffer[-1] for x in self.buffer[-self.match_size:]):
                     if self.curr_letter != cp:
                         self.add_letter(cp)
+
                 # if we've seen "away" self.match_size/2 times in a row, add it
-                if all(x == "away" for x in self.sequence_buffer[-int(self.match_size/2):]):
-                    self.word_is_signed = True
-                    self.word_signed = "away"
+                #if all(x == "away" for x in self.sequence_buffer[-int(self.match_size/2):]):
+                #    self.word_is_signed = True
+                #    self.word_signed = "away"
 
             self.display_frame(frame)
 
+            """
             if self.word_is_signed and self.word_signed == "away":
                 self.word_is_signed = False
                 self.curr_letter = ""
                 self.word_signed = ""
                 self.display_instance.display_query(self.curr_input)
                 self.input_finished = 1
+            """
 
-            #if results.multi_hand_landmarks == None:
-            #    self.curr_letter = ""
-            #    self.display_instance.display_query(self.curr_input)
-            #    self.input_finished = 1
+            if results.multi_hand_landmarks == None:
+                self.curr_letter = ""
+                self.display_instance.display_query(self.curr_input)
+                self.input_finished = 1
 
     # Parses set of frames from ASL to a word
     def parse_sequence_word(self):
@@ -181,10 +186,10 @@ class Interpreter:
                     self.sequence_buffer.pop(0)
                     self.sequence_buffer.append(seq_cp)
 
-                # if we've seen "hello" 3 times in a row, add it
-                if all(x == "hello" for x in self.sequence_buffer[-(int(self.match_size/4)):]):
+                # if we've seen "away" 3 times in a row, add it
+                if all(x == "away" for x in self.sequence_buffer[-(int(self.match_size/4)):]):
                     self.word_is_signed = True
-                    self.word_signed = "hello"
+                    self.word_signed = "away"
 
                 # update feature buffer
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
@@ -238,12 +243,17 @@ class Interpreter:
         return self.is_word_signed("away")
 
     def is_word_signed(self, word: str):
+        self.feature_buffer = []
+        self.sequence_buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+
         frame_cnt = 0
         while True:
             frame_cnt += 1
             self.parse_sequence_word()
             if frame_cnt >= constants.SEQUENCE_INPUT_SIZE*2 or self.word_is_signed:
                 break
+        print(self.word_signed)
+
         if self.word_is_signed and self.word_signed == word:
             self.word_signed = ""
             self.word_is_signed = False
@@ -263,7 +273,7 @@ class Interpreter:
         self.display_frame(frame)
 
         #while not self.is_hand_in_frame(frame):
-        while not self.is_hello_signed(frame):
+        while not self.is_away_signed(frame):
             frame = streamer.frame
             self.display_frame(frame)
 
