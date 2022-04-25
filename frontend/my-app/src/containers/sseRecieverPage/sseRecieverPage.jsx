@@ -1,4 +1,4 @@
-import { Spinner } from "@geist-ui/react";
+import { Spinner, Image } from "@geist-ui/react";
 import React from "react";
 import loading from "./loading.gif";
 import * as Constants from "../../constants";
@@ -13,7 +13,9 @@ class sseRecieverPage extends React.Component {
       fsm_state: "sleep",
       response: "",
       loading: false,
+      hand: "left",
     };
+    this.history = [];
     this.ws = new WebSocket(Constants.WEB_SOCKET);
   }
 
@@ -32,6 +34,11 @@ class sseRecieverPage extends React.Component {
         if (data.state === Constants.FSM_SLEEP) {
           this.setState({
             input: "",
+          });
+        }
+        if (data.state === "hand") {
+          this.setState({
+            hand: data.hand,
           });
         }
         if (data.state === Constants.FSM_GREEN) {
@@ -54,8 +61,10 @@ class sseRecieverPage extends React.Component {
           this.setState({
             input: data.input,
           });
+          this.history.push(this.input);
         }
         if (data.state === Constants.FSM_DISPLAY) {
+          this.history.push(this.response);
           this.setState({
             response: data.response,
           });
@@ -71,14 +80,14 @@ class sseRecieverPage extends React.Component {
     };
 
     return (
-      <div>
-        <h1 className="header"> Welcome to Project MANI</h1>
-        <div className="sse-page">
+      <div className="sse-page">
+        {this.state.hand === "left" && (
           <div className="video-container">
             <img src={Constants.STREAM_URL} className="video" />
           </div>
-
-          <div className="text_container">
+        )}
+        <div className="text_container">
+          <div className="input-response">
             {this.state.fsm_state === Constants.FSM_SLEEP && (
               <div>
                 <h1>
@@ -139,11 +148,18 @@ class sseRecieverPage extends React.Component {
                 </div>
               </div>
             )}
+            <div></div>
           </div>
         </div>
+        {this.state.hand === "right" && (
+          <div className="video-container">
+            <img src={"//127.0.0.1:5555/stream"} className="video" />
+          </div>
+        )}
       </div>
     );
   }
 }
 
 export default sseRecieverPage;
+/*<img className="logo" src={maniLogo} />*/

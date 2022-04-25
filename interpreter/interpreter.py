@@ -43,6 +43,8 @@ class Interpreter:
         self.curr_letter = ''
         self.curr_input = ''
 
+        self.hand_assigned = False
+
         self.med_delta_time = constants.INITIAL_TIME
         self.time_buffer = []
         self.match_size = self.compute_match_size()
@@ -76,12 +78,32 @@ class Interpreter:
 
             # if hand detected
             if results.multi_hand_landmarks:
+                if not self.hand_assigned:
+                    for hand in results.multi_handedness:
+                        handType=hand.classification[0].label
+                        print(handType)
+                        self.display_instance.display_state(
+                            'hand', {"hand": handType.lower()})
+                        self.hand_assigned = True
+                        break
+
                 # update match size value based on frame rate
                 self.update_match_size()
 
                 # get current hand landmarks
                 hand_landmarks = results.multi_hand_landmarks[0]
 
+                # editting frame
+                frame = self.frame_transform(frame)
+                landmarks_style = self.mp_drawing_styles.get_default_hand_landmarks_style()
+                for style in landmarks_style.values():
+                    style.color = (128, 64, 128)
+                    style.circle_radius = 0
+
+                connections_style = self.mp_drawing_styles.get_default_hand_connections_style()
+                for style in connections_style.values():
+                    style.color = (128, 64, 128)
+                    
                 # draw landmarks on top of frame
                 self.mp_drawing.draw_landmarks(
                     frame,
@@ -143,16 +165,13 @@ class Interpreter:
             if self.word_is_signed and self.word_signed == "away":
                 self.word_is_signed = False
                 self.curr_letter = ""
-                self.word_signed = ""
-                self.display_instance.display_query(self.curr_input)
-                self.input_finished = 1
             """
-
             if results.multi_hand_landmarks == None:
+                self.hand_assigned = False
                 self.curr_letter = ""
                 self.display_instance.display_query(self.curr_input)
                 self.input_finished = 1
-
+            
     # Parses set of frames from ASL to a word
     def parse_sequence_word(self):
         frame = streamer.frame
@@ -252,7 +271,6 @@ class Interpreter:
             self.parse_sequence_word()
             if frame_cnt >= constants.SEQUENCE_INPUT_SIZE*2 or self.word_is_signed:
                 break
-        print(self.word_signed)
 
         if self.word_is_signed and self.word_signed == word:
             self.word_signed = ""
@@ -269,13 +287,21 @@ class Interpreter:
         while frame is None:
             frame = streamer.frame
             time.sleep(.1)
-            
-        self.display_frame(frame)
+        
+        disp_frame = self.frame_transform(frame)
+        self.display_frame(disp_frame)
 
         #while not self.is_hand_in_frame(frame):
         while not self.is_away_signed(frame):
             frame = streamer.frame
-            self.display_frame(frame)
+            disp_frame = self.frame_transform(frame)
+            self.display_frame(disp_frame)
+
+    
+    def frame_transform(self, frame):
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2RGB)
+        return frame
 
     # Captures the full sign input from the user, utilizes more complicated FSM logic
     def capture_full_input(self):
