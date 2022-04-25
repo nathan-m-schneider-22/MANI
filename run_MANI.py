@@ -7,7 +7,6 @@ import interpreter.streamer as streamer
 import argparse
 import time
 
-
 class MANI:
     def __init__(self, args):
         self.display = Display(start_display=not args['run_logic'])
