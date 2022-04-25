@@ -28,18 +28,6 @@ The display connects to the core logic initially, then the core logic uses web s
 Additionally, the core logic streams the ML-processed video from the sign capture to the display. 
 
 # Development
-## Prereqs
-Install and use Python 3.9.7 for this project (you can use pyenv to keep multiple python versions on your computer)
-It is reccommended when running core logic to use a python package manager like virtualenv or conda. 
-
-1) Install the core logic dependencies
-```bash 
-pip install -r requirements.txt
-```
-2) Install display dependencies 
-```
-cd frontend/my-app && npm install
-```
 
 ## Connect to the Raspberry Pi
 Because the Dartmouth wifi networks use client isolation, connecting to the Pi from your laptop requires a direct ethernet connection (dongles available at the library circulation desk). 
@@ -54,14 +42,28 @@ Raw ssh is fine, however we can get significant utility out of using [VSCode rem
 
 NOTE: If you want to run the project without having to deal with the RPI, you can use the `--mock` when starting the core logic to run without connecting to the raspberry pi for the virtual assistance. 
 
+## Prereqs
+Install and use Python 3.9.7 for this project (you can use pyenv to keep multiple python versions on your computer)
+It is reccommended when running core logic to use a python package manager like virtualenv or conda. 
+
+1) Install the core logic dependencies
+```bash 
+pip install -r requirements.txt
+```
+2) Install display dependencies 
+```
+cd frontend/my-app && npm install
+```
+Make sure npm version is < 8 to avoid errors with installation
+
 ## Start the core logic
 
 ```bash
-python run_MANI.py --logic
+python3 run_MANI.py --logic
 ```
 or if you want to use a mock VA 
 ```bash
-python run_MANI.py --logic --mock
+python3 run_MANI.py --logic --mock
 ```
 
 NOTE: When you make changes to the core logic code, you must stop the process and re-reun the command to run the new code. 
