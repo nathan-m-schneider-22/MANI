@@ -13,7 +13,7 @@ class sseRecieverPage extends React.Component {
       fsm_state: "sleep",
       response: "",
       loading: false,
-      hand: "left",
+      hand: "right",
     };
     this.history = [];
     this.ws = new WebSocket(Constants.WEB_SOCKET);
@@ -140,6 +140,10 @@ class sseRecieverPage extends React.Component {
                   {/* <h2>{this.state.response}</h2> */}
                   <div>
                     <iframe
+                      // this is a very strange styling trick to make sure that the frame is on the correct side
+                      // the frame is made to fit the whole screen, then scaled to half size, leaving it in the middle of the screen,
+                      // need to move it 25% Left or right if we want it to be on the right side
+                      style={{right: this.state.hand == 'right' ? '25%': '-25%'}}
                       className="assistant-frame"
                       title="MANI"
                       srcdoc={this.state.response}
@@ -148,12 +152,11 @@ class sseRecieverPage extends React.Component {
                 </div>
               </div>
             )}
-            <div></div>
           </div>
         </div>
         {this.state.hand === "right" && (
           <div className="video-container">
-            <img src={"//127.0.0.1:5555/stream"} className="video" />
+            <img src={Constants.STREAM_URL} className="video" />
           </div>
         )}
       </div>
