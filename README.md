@@ -1,5 +1,6 @@
 # MANI
-Gesture-based virtual assistant
+A gesture-based virtual assistant
+
 MANI serves to provide a convenient virtual assistant that can be queried using gestures, such as fingerspelling, quickly, easily, and from anywhere in a room. 
 
 # Architecture
