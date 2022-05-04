@@ -1,5 +1,6 @@
 import threading
 import cv2
+import time
 from .camera import Camera
 from flask import Flask, Response
 
@@ -19,8 +20,12 @@ def generate():
     global lock, outputFrame, frame, camera, display_raw_frame
 
     # loop over frames from the output stream
+    prev_frame_time = 0
+    new_frame_time = 0
+    frame_count = 0
     while True:
         # wait until the lock is acquired
+
         with lock:
             
             frame = camera.capture_image()
@@ -32,7 +37,12 @@ def generate():
                 continue
             # encode the frame in JPEG format
             (flag, encodedImage) = cv2.imencode(".jpg", outputFrame)
-
+            
+            # new_frame_time = time.time()
+            # fps = 1/(new_frame_time - prev_frame_time)
+            # prev_frame_time = new_frame_time
+            # fps = str(int(fps))
+            # print(fps)
             # ensure the frame was successfully encoded
             if not flag:
                 continue
