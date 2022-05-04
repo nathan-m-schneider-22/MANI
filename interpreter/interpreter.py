@@ -41,6 +41,7 @@ class Interpreter:
 
         # interpreter sentence inference variables
         self.curr_letter = ''
+        self.curr_seq_letter = ''
         self.curr_input = ''
 
         self.hand_assigned = False
@@ -51,11 +52,13 @@ class Interpreter:
         self.prev_time = time.time()
 
         self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+        self.prob_buffer = [0 for _ in range(constants.MAX_BUFFER_SIZE)]
 
         # sequence feature buffer
         self.feature_buffer = []
         self.sequence_buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
-        
+        self.sequence_prob_buffer = [0 for _ in range(constants.MAX_BUFFER_SIZE)]
+
         self.word_is_signed = False
         self.word_signed = ''
 
@@ -67,6 +70,10 @@ class Interpreter:
     # Parses the current frame from ASL to a letter
     def parse_frame(self):
         frame = streamer.frame
+        
+        char_signed = False
+        word_signed = False
+        
         if frame is not None:
 
             # convert frame to RGB for processing
@@ -118,28 +125,36 @@ class Interpreter:
                 preds = self.model.predict_proba(features)
                 
                 cp = self.model.classes_[np.argmax(preds)]
+                cp_prob = np.max(preds)
+
+                # update prob buffer
+                self.prob_buffer.pop(0)
+                self.prob_buffer.append(cp_prob)
 
                 # update buffer
                 self.buffer.pop(0)
                 self.buffer.append(cp)
 
                 # making sequence prediction
-                """
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
                     seq_features = np.array(self.feature_buffer)
                     seq_features = np.reshape(seq_features, seq_features.size).reshape(1, -1)
                     seq_preds = self.seq_model.predict_proba(seq_features)
                     seq_cp = self.seq_model.classes_[np.argmax(seq_preds)]
-                    
+                    seq_cp_prob = np.max(seq_preds)
+
                     # update sequence buffer
                     self.sequence_buffer.pop(0)
                     self.sequence_buffer.append(seq_cp)
+
+                    # update sequence prob buffer
+                    self.sequence_prob_buffer.pop(0)
+                    self.sequence_prob_buffer.append(seq_cp_prob)
                 
                 # update feature buffer
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
                     self.feature_buffer.pop(0)
                 self.feature_buffer.append(features)
-                """
 
                 # send current input to the display 
                 self.display_instance.display_state(
@@ -151,24 +166,41 @@ class Interpreter:
 
                 # if we've seen cp self.match_size times in a row, add it
                 if all(x == self.buffer[-1] for x in self.buffer[-self.match_size:]):
+                    char_signed = True
+
+                if all(x == self.sequence_buffer[-1] for x in self.sequence_buffer[-int(self.match_size/2):]) \
+                    and self.sequence_buffer[-1] in ["j", "z"]:
+                    word_signed = True
+                print(word_signed)
+
+                if char_signed and word_signed:
+                    word_weight = sum(self.sequence_prob_buffer[-int(self.match_size/2):])
+                    char_weight = sum(self.prob_buffer[-int(self.match_size/2):])
+                    print(word_weight)
+                    print(char_weight)
+
+                    if char_weight > word_weight:
+                        if self.curr_letter != cp:
+                            self.add_letter(cp) 
+
+                    if word_weight > char_weight: 
+                        if self.curr_seq_letter != seq_cp:
+                            self.add_seq_letter(seq_cp)
+
+                elif word_signed:
+                    if self.curr_seq_letter != seq_cp:
+                        self.add_seq_letter(seq_cp)
+
+                elif char_signed:
                     if self.curr_letter != cp:
-                        self.add_letter(cp)
-
-                # if we've seen "away" self.match_size/2 times in a row, add it
-                #if all(x == "away" for x in self.sequence_buffer[-int(self.match_size/2):]):
-                #    self.word_is_signed = True
-                #    self.word_signed = "away"
-
+                        self.add_letter(cp)    
+             
             self.display_frame(frame)
 
-            """
-            if self.word_is_signed and self.word_signed == "away":
-                self.word_is_signed = False
-                self.curr_letter = ""
-            """
             if results.multi_hand_landmarks == None:
                 self.hand_assigned = False
                 self.curr_letter = ""
+                self.curr_seq_letter = ""
                 self.display_instance.display_query(self.curr_input)
                 self.input_finished = 1
             
@@ -220,12 +252,26 @@ class Interpreter:
     # Add letter to input query and display it
     def add_letter(self, cp: str):
         self.curr_letter = cp
+        self.curr_seq_letter = ''
         if self.curr_letter == 'x':
             self.curr_input = self.curr_input[:-1]
             self.curr_letter = ''
         else:
             self.curr_input += self.curr_letter
+
         self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+        self.sequence_buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+
+        self.display_instance.display_state(
+            "save", {"input": self.curr_input})
+
+    def add_seq_letter(self, seq_cp: str):
+        self.curr_seq_letter = seq_cp
+        self.curr_letter = ''
+        self.curr_input += self.curr_seq_letter
+
+        self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+        self.sequence_buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
 
         self.display_instance.display_state(
             "save", {"input": self.curr_input})
