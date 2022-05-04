@@ -35,7 +35,7 @@ class Interpreter:
         self.mp_drawing = mp.solutions.drawing_utils
 
         self.hands = self.mp_hands.Hands(
-            model_complexity=constants.MODEL_COMPLEXITY,
+            # model_complexity=constants.MODEL_COMPLEXITY,
             min_detection_confidence=constants.MIN_DETECTION_CONFIDENCE,
             min_tracking_confidence=constants.MIN_TRACKING_CONFIDENCE)
 
