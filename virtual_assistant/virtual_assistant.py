@@ -26,11 +26,13 @@ class VirtualAssistant:
         self.display_instance.display_state("send", {"input": input})
         if self.mock_va:
             time.sleep(3)
+            html_file = open('weather_response.html', 'r')
+            html_result = html_file.read()
             print("Using mock VA response")
-            return "Mock VA response"
+            return html_result
         else:
             html_result = call_outsourced_API(input)
-
+    
 
             print("HTML Results:", html_result)
             # print("Text Result: ", text_result)

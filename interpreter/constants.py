@@ -10,3 +10,6 @@ MODEL_COMPLEXITY = 0
 MIN_DETECTION_CONFIDENCE = .8
 MIN_TRACKING_CONFIDENCE = .6
 
+# sequence model parameters
+SEQUENCE_INPUT_SIZE = 5 # nubmer of frames
+
