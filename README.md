@@ -1,7 +1,6 @@
 # MANI
-ASL Virtual Assistant for the Deaf
-
-MANI serves to provide ASL users with a convenient virtual assistant, to use quickly, easily, and from anywhere in a room. 
+Gesture-based virtual assistant
+MANI serves to provide a convenient virtual assistant that can be queried using gestures, such as fingerspelling, quickly, easily, and from anywhere in a room. 
 
 # Architecture
 MANI is comprised (currently) three parts:
