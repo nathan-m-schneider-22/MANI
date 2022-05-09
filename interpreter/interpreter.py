@@ -22,10 +22,10 @@ class Interpreter:
     def __init__(self, display_instance: Display):
         self.display_instance = display_instance
         
-        checkpoint_path = "./interpreter/new_model/output/model1.joblib"
-        self.model = load(checkpoint_path)
+        #checkpoint_path = "./interpreter/new_model/output/model1.joblib"
+        #self.model = load(checkpoint_path)
 
-        sequence_path = "./interpreter/new_model/output/sequence-model.joblib"
+        sequence_path = "./interpreter/new_model/output/sequence-model-words.joblib"
         self.seq_model = load(sequence_path)
 
         # mediapipe model
@@ -122,6 +122,7 @@ class Interpreter:
                 # making prediction
                 features, _ = extract_features(
                     [hand_landmarks], ['a'], input_type='inference')
+                """
                 preds = self.model.predict_proba(features)
                 
                 cp = self.model.classes_[np.argmax(preds)]
@@ -134,8 +135,10 @@ class Interpreter:
                 # update buffer
                 self.buffer.pop(0)
                 self.buffer.append(cp)
+                """
 
                 # making sequence prediction
+                seq_cp = " "
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
                     seq_features = np.array(self.feature_buffer)
                     seq_features = np.reshape(seq_features, seq_features.size).reshape(1, -1)
@@ -158,42 +161,15 @@ class Interpreter:
 
                 # send current input to the display 
                 self.display_instance.display_state(
-                    'green', {"letter": cp, "input": self.curr_input})
+                    'green', {"letter": seq_cp, "input": self.curr_input})
 
-                # convert '_' output to space
-                if cp == '_':
-                    cp = ' ' 
 
-                # if we've seen cp self.match_size times in a row, add it
-                if all(x == self.buffer[-1] for x in self.buffer[-self.match_size:]):
-                    char_signed = True
-
-                if all(x == self.sequence_buffer[-1] for x in self.sequence_buffer[-int(self.match_size/2):]) \
-                    and self.sequence_buffer[-1] in ["j", "z"]:
+                if all(x == self.sequence_buffer[-1] for x in self.sequence_buffer[-int(self.match_size):]):
                     word_signed = True
-                print(word_signed)
 
-                if char_signed and word_signed:
-                    word_weight = sum(self.sequence_prob_buffer[-int(self.match_size/2):])
-                    char_weight = sum(self.prob_buffer[-int(self.match_size/2):])
-                    print(word_weight)
-                    print(char_weight)
-
-                    if char_weight > word_weight:
-                        if self.curr_letter != cp:
-                            self.add_letter(cp) 
-
-                    if word_weight > char_weight: 
-                        if self.curr_seq_letter != seq_cp:
-                            self.add_seq_letter(seq_cp)
-
-                elif word_signed:
+                if word_signed:
                     if self.curr_seq_letter != seq_cp:
                         self.add_seq_letter(seq_cp)
-
-                elif char_signed:
-                    if self.curr_letter != cp:
-                        self.add_letter(cp)    
              
             self.display_frame(frame)
 
@@ -268,7 +244,7 @@ class Interpreter:
     def add_seq_letter(self, seq_cp: str):
         self.curr_seq_letter = seq_cp
         self.curr_letter = ''
-        self.curr_input += self.curr_seq_letter
+        self.curr_input += self.curr_seq_letter + " "
 
         self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
         self.sequence_buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
@@ -336,8 +312,8 @@ class Interpreter:
         
         self.display_frame(frame)
 
-        #while not self.is_hand_in_frame(frame):
-        while not self.is_away_signed(frame):
+        while not self.is_hand_in_frame(frame):
+            #while not self.is_away_signed(frame):
             frame = streamer.frame
             self.display_frame(frame)
 
@@ -350,9 +326,12 @@ class Interpreter:
     # Captures the full sign input from the user, utilizes more complicated FSM logic
     def capture_full_input(self):
         print("Capturing input")
-        self.curr_letter = ''
-        self.curr_input = ''
+        self.curr_letter = ""
+        self.curr_seq_letter = ""
+        self.curr_input = ""
         self.input_finished = 0
+        self.buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
+        self.sequence_buffer = ['*' for _ in range(constants.MAX_BUFFER_SIZE)]
 
         while not self.input_finished:
             self.parse_frame()
