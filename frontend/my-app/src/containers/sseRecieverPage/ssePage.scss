@@ -1,7 +1,13 @@
+html {
+    height:100vh;
+    overflow:hidden;
+    margin: 0;
+}
 .sse-page {
+    overflow: hidden;
+    height: 100vh;
     display: flex;
     flex-direction: row;
-    height: 100%;
     .video-container {
         flex: 1;
         border-style: solid;
@@ -82,4 +88,23 @@
     -webkit-transform: scale(0.5);
     transform: scale(0.5);
     position: absolute;
+    animation: fade_in 1s linear;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fade_in {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+@keyframes slide_up {
+    0% {
+        bottom: -100%;
+    }
+    100% {
+        bottom: 0%;
+    }
 }
