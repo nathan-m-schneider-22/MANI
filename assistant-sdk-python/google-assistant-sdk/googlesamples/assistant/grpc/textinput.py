@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Sample that implements a text client for the Google Assistant Service."""
-
+import time
 import os
 import logging
 import json
@@ -41,6 +41,31 @@ except (SystemError, ImportError):
 ASSISTANT_API_ENDPOINT = 'embeddedassistant.googleapis.com'
 DEFAULT_GRPC_DEADLINE = 60 * 3 + 5
 PLAYING = embedded_assistant_pb2.ScreenOutConfig.PLAYING
+
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+
+
+
+@app.route('/', methods=['POST'])
+def rec_query():
+    content = request.json
+    query = content['query']
+    print(query)
+
+    # query = click.prompt('')
+    # click.echo('<you> %s' % query)
+    response_html = assistant.assist(text_query=query)
+    print(response_html)
+    if response_html:
+
+        html = response_html
+        return jsonify({"html":html})
+    html = "<h1> Failed to get response HTML </h1>"
+    return jsonify({"html":html})
+
+
+
 
 
 class SampleTextAssistant(object):
@@ -125,6 +150,8 @@ class SampleTextAssistant(object):
         # print(html_response)
         return html_response
 
+assistant = None
+
 
 @click.command()
 @click.option('--api-endpoint', default=ASSISTANT_API_ENDPOINT,
@@ -158,10 +185,13 @@ class SampleTextAssistant(object):
 @click.option('--grpc-deadline', default=DEFAULT_GRPC_DEADLINE,
               metavar='<grpc deadline>', show_default=True,
               help='gRPC deadline in seconds')
+
 def main(api_endpoint, credentials,
          device_model_id, device_id, lang, display, verbose,
          grpc_deadline, *args, **kwargs):
     # Setup logging.
+
+    st = time.time()
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO)
 
     # Load OAuth 2.0 credentials.
@@ -183,17 +213,11 @@ def main(api_endpoint, credentials,
     logging.info('Connecting to %s', api_endpoint)
 
     with SampleTextAssistant(lang, device_model_id, device_id, display,
-                             grpc_channel, grpc_deadline) as assistant:
-        while True:
-            query = click.prompt('')
-            click.echo('<you> %s' % query)
-            response_html = assistant.assist(text_query=query)
-            if display and response_html:
-                system_browser = browser_helpers.system_browser
-                system_browser.display(response_html)
-            # if response_text:
-            #     click.echo('<@assistant> %s' % response_text)
+                             grpc_channel, grpc_deadline) as assistant_copy:
+        global assistant
+        assistant = assistant_copy
 
+        app.run(host= '0.0.0.0',port=6000,debug=True)
 
 if __name__ == '__main__':
     main()
