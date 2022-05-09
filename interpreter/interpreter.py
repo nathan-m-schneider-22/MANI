@@ -337,8 +337,7 @@ class Interpreter:
             frame = streamer.frame
             time.sleep(.1)
         
-        disp_frame = self.frame_transform(frame)
-        self.display_frame(disp_frame)
+        self.display_frame(frame)
 
         st = time.time()
         while not self.is_hand_in_frame(frame):
@@ -347,8 +346,7 @@ class Interpreter:
             st = time.time()
 
             frame = streamer.frame
-            disp_frame = self.frame_transform(frame)
-            self.display_frame(disp_frame)
+            self.display_frame(frame)
 
 
 

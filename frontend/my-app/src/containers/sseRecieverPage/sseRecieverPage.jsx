@@ -150,6 +150,10 @@ class sseRecieverPage extends React.Component {
                     <h1>Input: {this.state.input}</h1>
                     {/* <h2>{this.state.response}</h2> */}
                     <div>
+                      {/* <div 
+                        className="assistant-frame-hacky-fade-in" 
+                        style={{ right: this.state.hand == 'right' ? '25%' : '-25%' }}
+                      /> */}
                       <iframe
                         // this is a very strange styling trick to make sure that the frame is on the correct side
                         // the frame is made to fit the whole screen, then scaled to half size, leaving it in the middle of the screen,
