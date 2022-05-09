@@ -24,12 +24,12 @@ feature_idxes = [np.arange(0, 210), np.arange(210, 651), np.arange(651, 714)]
 feature_names = [feature_names[1], feature_names[2]]
 feature_idxes = [feature_idxes[1], feature_idxes[2]]
 
-base_path = "output/distance_segment_angles/"
+base_path = "output/" #distance_segment_angles/
 plot_cm = False
 log = True
 normalize = False
 augment = False
-ensemble = True
+ensemble = False
 n_ensemble_iters = 15
 
 ## logger
@@ -58,6 +58,7 @@ y_test = np.load(f'{base_path}/test_labels.npy')
 X_n = np.empty(shape=(X.shape[0],0))
 X_tn = np.empty(shape=(X_test.shape[0],0))
 for idxes in feature_idxes:
+    idxes = idxes-210
     X_n = np.hstack((X_n, X[:, idxes]))
     X_tn = np.hstack((X_tn, X_test[:, idxes]))
 
@@ -149,4 +150,4 @@ if log:
                             y_true=y_test, preds=preds,
                             class_names=dl.allowed_labels)})
 
-dump(clf, "output/model.joblib")
+dump(clf, "output/model1.joblib")

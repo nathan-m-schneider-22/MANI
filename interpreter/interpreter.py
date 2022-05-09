@@ -22,7 +22,7 @@ class Interpreter:
     def __init__(self, display_instance: Display):
         self.display_instance = display_instance
         
-        checkpoint_path = "./interpreter/new_model/output/model.joblib"
+        checkpoint_path = "./interpreter/new_model/output/model1.joblib"
         self.model = load(checkpoint_path)
 
         sequence_path = "./interpreter/new_model/output/sequence-model.joblib"
