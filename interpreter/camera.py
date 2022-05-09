@@ -7,8 +7,8 @@ cap = cv2.VideoCapture(0)
 
 class Camera:
     def __init__(self):
-        self.cap = cv2.VideoCapture(0)
-        if not cap.isOpened():
+        self.cap = cap
+        if not self.cap.isOpened():
             raise IOError("Cannot open webcam")
         else:
             print("opening camera")

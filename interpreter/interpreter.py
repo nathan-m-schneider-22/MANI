@@ -1,4 +1,4 @@
-from turtle import update
+# from turtle import update
 
 from .camera import Camera
 from statistics import median
@@ -207,8 +207,11 @@ class Interpreter:
     # Parses set of frames from ASL to a word
     def parse_sequence_word(self):
         frame = streamer.frame
-        if frame is not None:
 
+        # disp_frame = self.frame_transform(frame)
+        self.display_frame(frame)
+
+        if frame is not None:
             # convert frame to RGB for processing
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             results = self.hands.process(frame)
@@ -337,11 +340,17 @@ class Interpreter:
         disp_frame = self.frame_transform(frame)
         self.display_frame(disp_frame)
 
-        #while not self.is_hand_in_frame(frame):
-        while not self.is_away_signed(frame):
+        st = time.time()
+        while not self.is_hand_in_frame(frame):
+        # while not self.is_away_signed(frame):
+            print(1000*(time.time() -st))
+            st = time.time()
+
             frame = streamer.frame
             disp_frame = self.frame_transform(frame)
             self.display_frame(disp_frame)
+
+
 
     
     def frame_transform(self, frame):
@@ -356,8 +365,13 @@ class Interpreter:
         self.curr_input = ''
         self.input_finished = 0
 
+        st = time.time()
+
         while not self.input_finished:
             self.parse_frame()
+
+            print('TIME: ',1000*(time.time() -st))
+            st = time.time()
 
         return self.curr_input
 

@@ -34,7 +34,10 @@ It is reccommended when running core logic to use a python package manager like 
 
 1) Install the core logic dependencies
 ```bash 
-pip install -r requirements.txt
+pip3 install -r requirements.txt
+sudo apt install ffmpeg python3-opencv python3-pip
+sudo apt install libxcb-shm0 libcdio-paranoia-dev libsdl2-2.0-0 libxv1  libtheora0 libva-drm2 libva-x11-2 libvdpau1 libharfbuzz0b libbluray2 libatlas-base-dev libhdf5-103 libgtk-3-0 libdc1394-22 libopenexr23
+
 ```
 2) Install display dependencies 
 ```

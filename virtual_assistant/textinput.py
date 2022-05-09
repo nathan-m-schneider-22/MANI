@@ -96,16 +96,12 @@ class SampleTextAssistant(object):
                     device_id=self.device_id,
                     device_model_id=self.device_model_id,
                 ),
-                screen_out_config=embedded_assistant_pb2.ScreenOutConfig(
-                    screen_mode=PLAYING
-                ),
                 text_query=text_query,
             )
             # Continue current conversation with later requests.
             self.is_new_conversation = False
             if self.display:
                 config.screen_out_config.screen_mode = PLAYING
-            # config.screen_out.format=HTML
             req = embedded_assistant_pb2.AssistRequest(config=config)
             assistant_helpers.log_assist_request_without_audio(req)
             yield req
@@ -122,8 +118,7 @@ class SampleTextAssistant(object):
                 self.conversation_state = conversation_state
             if resp.dialog_state_out.supplemental_display_text:
                 text_response = resp.dialog_state_out.supplemental_display_text
-        # print(html_response)
-        return html_response
+        return text_response, html_response
 
 
 @click.command()
@@ -187,12 +182,12 @@ def main(api_endpoint, credentials,
         while True:
             query = click.prompt('')
             click.echo('<you> %s' % query)
-            response_html = assistant.assist(text_query=query)
+            response_text, response_html = assistant.assist(text_query=query)
             if display and response_html:
                 system_browser = browser_helpers.system_browser
                 system_browser.display(response_html)
-            # if response_text:
-            #     click.echo('<@assistant> %s' % response_text)
+            if response_text:
+                click.echo('<@assistant> %s' % response_text)
 
 
 if __name__ == '__main__':
