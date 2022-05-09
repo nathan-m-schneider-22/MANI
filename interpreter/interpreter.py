@@ -334,14 +334,12 @@ class Interpreter:
             frame = streamer.frame
             time.sleep(.1)
         
-        disp_frame = self.frame_transform(frame)
-        self.display_frame(disp_frame)
+        self.display_frame(frame)
 
         #while not self.is_hand_in_frame(frame):
         while not self.is_away_signed(frame):
             frame = streamer.frame
-            disp_frame = self.frame_transform(frame)
-            self.display_frame(disp_frame)
+            self.display_frame(frame)
 
     
     def frame_transform(self, frame):
