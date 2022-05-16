@@ -66,6 +66,15 @@ class Interpreter:
         self.word_is_signed = False
         self.word_signed = ''
 
+    def choose_higher_hand(self, multi_hand_landmarks):
+        max_height = 2
+        max_index = 0
+        for (i, landmarks) in enumerate(multi_hand_landmarks):
+            if landmarks.landmark[0].y < max_height:
+                max_index = i
+                max_height = landmarks.landmark[0].y
+        return max_index  
+            
     # Parses the current frame from ASL to a letter
     def parse_frame(self):
         frame = streamer.frame
@@ -84,19 +93,19 @@ class Interpreter:
 
             # if hand detected
             if results.multi_hand_landmarks:
+                higher_hand = self.choose_higher_hand(results.multi_hand_landmarks)
                 if not self.hand_assigned:
-                    for hand in results.multi_handedness:
-                        handType=hand.classification[0].label
-                        self.display_instance.display_state(
-                            'hand', {"hand": handType.lower()})
-                        self.hand_assigned = True
-                        break
+                    hand = results.multi_handedness[higher_hand]
+                    handType=hand.classification[0].label
+                    self.display_instance.display_state(
+                        'hand', {"hand": handType.lower()})
+                    self.hand_assigned = True
 
                 # update match size value based on frame rate
                 self.update_match_size()
 
                 # get current hand landmarks
-                hand_landmarks = results.multi_hand_landmarks[0]
+                hand_landmarks = results.multi_hand_landmarks[higher_hand]
                 
                 with self.hand_landmark_lock:
                     self.hand_landmarks = hand_landmarks
