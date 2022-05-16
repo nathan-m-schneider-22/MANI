@@ -17,6 +17,7 @@ from joblib import load
 from . import streamer
 from .new_model.preprocess.feature_extractor import extract_features
 from display.display import Display
+from .pose_servo import turn_towards_pose
 
 # Interpreter class to parse images into signs, and build signs
 class Interpreter:
@@ -36,7 +37,7 @@ class Interpreter:
         self.mp_drawing = mp.solutions.drawing_utils
 
         self.hands = self.mp_hands.Hands(
-            model_complexity=constants.MODEL_COMPLEXITY,
+            # model_complexity=constants.MODEL_COMPLEXITY,
             min_detection_confidence=constants.MIN_DETECTION_CONFIDENCE,
             min_tracking_confidence=constants.MIN_TRACKING_CONFIDENCE)
         
@@ -310,6 +311,7 @@ class Interpreter:
 
         while not self.is_hand_in_frame(frame):
             frame = streamer.frame
+            turn_towards_pose(frame)
 
         stop_threads = True
         t1.join()       

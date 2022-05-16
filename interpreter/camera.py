@@ -18,7 +18,7 @@ class Camera:
     def capture_image(self):
         try:
             ret, frame = self.cap.read()
-            frame = cv2.flip(frame, 1)
+            frame = cv2.flip(frame, 0)
 
             return frame
         except:
