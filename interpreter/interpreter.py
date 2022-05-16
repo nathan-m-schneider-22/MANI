@@ -67,9 +67,12 @@ class Interpreter:
         self.word_signed = ''
 
     def choose_higher_hand(self, multi_hand_landmarks):
-        max_height = 2
+        max_height = 2 
+        # height is between 0 and 1, 1 is all the way at bottom and 0 at top
         max_index = 0
         for (i, landmarks) in enumerate(multi_hand_landmarks):
+            # because smaller numbers are higher, the hand must be a lower number than the max
+            # using landmark[0] which is the wrist
             if landmarks.landmark[0].y < max_height:
                 max_index = i
                 max_height = landmarks.landmark[0].y
