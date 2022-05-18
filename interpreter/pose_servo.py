@@ -10,7 +10,7 @@ import mediapipe as mp
 import time
 
 # from project_posenet import pose_engine
-from pose_engine import PoseEngine
+# from pose_engine import PoseEngine
 
 # engine = PoseEngine(
 #     'project-posenet/models/mobilenet/posenet_mobilenet_v1_075_481_641_quant_decoder_edgetpu.tflite')

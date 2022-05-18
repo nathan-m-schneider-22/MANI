@@ -19,15 +19,23 @@ from .new_model.preprocess.feature_extractor import extract_features
 from display.display import Display
 from .pose_servo import turn_towards_pose
 
+
+lt = time.time()
+
+
 # Interpreter class to parse images into signs, and build signs
 class Interpreter:
     def __init__(self, display_instance: Display):
         self.display_instance = display_instance
         
-        checkpoint_path = "./interpreter/new_model/output/modelpy39.joblib"
+        # checkpoint_path = "./interpreter/new_model/output/modelpy39.joblib"
+        checkpoint_path = "./interpreter/new_model/output/model.joblib"
+
         self.model = load(checkpoint_path)
 
-        sequence_path = "./interpreter/new_model/output/sequence-model1.joblib"
+        # sequence_path = "./interpreter/new_model/output/sequence-model1.joblib"
+        sequence_path = "./interpreter/new_model/output/sequence-model.joblib"
+
         self.seq_model = load(sequence_path)
 
         # mediapipe model
@@ -37,7 +45,7 @@ class Interpreter:
         self.mp_drawing = mp.solutions.drawing_utils
 
         self.hands = self.mp_hands.Hands(
-            # model_complexity=constants.MODEL_COMPLEXITY,
+            model_complexity=constants.MODEL_COMPLEXITY,
             min_detection_confidence=constants.MIN_DETECTION_CONFIDENCE,
             min_tracking_confidence=constants.MIN_TRACKING_CONFIDENCE)
         
@@ -69,8 +77,12 @@ class Interpreter:
 
     # Parses the current frame from ASL to a letter
     def parse_frame(self):
+        global lt
         frame = streamer.frame
         
+        print(time.time() - lt)
+        lt = time.time()
+
         char_signed = False
         word_signed = False
         
@@ -102,6 +114,7 @@ class Interpreter:
                 with self.hand_landmark_lock:
                     self.hand_landmarks = hand_landmarks
 
+
                 # editting frame
                 frame = self.frame_transform(frame)
 
@@ -113,6 +126,7 @@ class Interpreter:
                 cp = self.model.classes_[np.argmax(preds)]
                 cp_prob = np.max(preds)
 
+
                 # update prob buffer
                 self.prob_buffer.pop(0)
                 self.prob_buffer.append(cp_prob)
@@ -121,8 +135,12 @@ class Interpreter:
                 self.buffer.pop(0)
                 self.buffer.append(cp)
 
+                print(time.time() - lt)
+
                 # making sequence prediction
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
+
+
                     seq_features = np.array(self.feature_buffer)
                     seq_features = np.reshape(seq_features, seq_features.size).reshape(1, -1)
                     seq_preds = self.seq_model.predict_proba(seq_features)
@@ -137,6 +155,8 @@ class Interpreter:
                     self.sequence_prob_buffer.pop(0)
                     self.sequence_prob_buffer.append(seq_cp_prob)
                 
+
+
                 # update feature buffer
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
                     self.feature_buffer.pop(0)
@@ -188,6 +208,8 @@ class Interpreter:
 
                 with self.hand_landmark_lock:
                     self.hand_landmarks = None
+
+
 
     # Add letter to input query and display it
     def add_letter(self, cp: str):
