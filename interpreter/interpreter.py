@@ -199,9 +199,9 @@ class Interpreter:
                     if self.curr_letter != cp:
                         self.add_letter(cp)    
             
+            if not constants.THREADING:
+                self.display_single_frame(frame, predict=True)
 
-            self.display_single_frame(frame, predict=True)
-            
             if results.multi_hand_landmarks == None:
                 self.hand_assigned = False
                 self.curr_letter = ""
@@ -333,7 +333,8 @@ class Interpreter:
 
         while not self.is_hand_in_frame(frame):
             frame = streamer.frame
-            self.display_single_frame(frame, predict=False)
+            if not constants.THREADING:
+                self.display_single_frame(frame, predict=False)
             if constants.RPI_DETECTED:
                 turn_towards_pose(frame)
 
