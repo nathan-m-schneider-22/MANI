@@ -13,3 +13,5 @@ MIN_TRACKING_CONFIDENCE = .6
 # sequence model parameters
 SEQUENCE_INPUT_SIZE = 5 # nubmer of frames
 
+import os
+RPI_DETECTED = os.uname()[0] == "Linux"

@@ -98,3 +98,5 @@ wincertstore
 yarl
 yaspin
 zipp
+mediapipe
+bs4
