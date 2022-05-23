@@ -200,6 +200,8 @@ class Interpreter:
                         self.add_letter(cp)    
             
 
+            self.display_single_frame(frame, predict=True)
+            
             if results.multi_hand_landmarks == None:
                 self.hand_assigned = False
                 self.curr_letter = ""
@@ -274,6 +276,14 @@ class Interpreter:
                     streamer.outputFrame = frame.copy()
             if stop():
                 break
+    
+    def display_single_frame(self, frame, predict=False):
+        if frame is not None:
+            if predict:
+                frame = self.frame_transform(frame)
+                frame = self.mp_hand_transform(frame)
+            with streamer.lock:
+                streamer.outputFrame = frame.copy()
 
     def mp_hand_transform(self, frame):
         with self.hand_landmark_lock:
@@ -315,19 +325,21 @@ class Interpreter:
         while frame is None:
             frame = streamer.frame
             time.sleep(.1)
-        
-        stop_threads = False
-        t1 = Thread(target=self.display_frame_wait_thread, args=(lambda : stop_threads, ))
-        t1.start()
+
+        if constants.THREADING:
+            stop_threads = False
+            t1 = Thread(target=self.display_frame_wait_thread, args=(lambda : stop_threads, ))
+            t1.start()
 
         while not self.is_hand_in_frame(frame):
             frame = streamer.frame
-
+            self.display_single_frame(frame, predict=False)
             if constants.RPI_DETECTED:
                 turn_towards_pose(frame)
 
-        stop_threads = True
-        t1.join()       
+        if constants.THREADING:
+            stop_threads = True
+            t1.join()       
 
     # Captures the full sign input from the user, utilizes more complicated FSM logic
     def capture_full_input(self):
@@ -336,14 +348,17 @@ class Interpreter:
         self.curr_input = ''
         self.input_finished = 0
         
-        stop_threads = False
-        t1 = Thread(target=self.display_frame_predict_thread, args=(lambda : stop_threads, ))
-        t1.start()
+        if constants.THREADING:
+            stop_threads = False
+            t1 = Thread(target=self.display_frame_predict_thread, args=(lambda : stop_threads, ))
+            t1.start()
+
         while not self.input_finished:
             self.parse_frame()
         
-        stop_threads = True
-        t1.join()
+        if constants.THREADING:
+            stop_threads = True
+            t1.join()
 
         return self.curr_input
 
