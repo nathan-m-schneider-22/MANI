@@ -175,15 +175,15 @@ class Interpreter:
                 if all(x == self.buffer[-1] for x in self.buffer[-self.match_size:]):
                     char_signed = True
 
-                if all(x == self.sequence_buffer[-1] for x in self.sequence_buffer[-int(self.match_size/2):]) \
+                if all(x == self.sequence_buffer[-1] for x in self.sequence_buffer[-int(self.match_size):]) \
                     and self.sequence_buffer[-1] in ["j", "z"]:
                     word_signed = True
 
                 if char_signed and word_signed:
-                    word_weight = sum(self.sequence_prob_buffer[-int(self.match_size/2):])
-                    char_weight = sum(self.prob_buffer[-int(self.match_size/2):])
+                    word_weight = sum(self.sequence_prob_buffer[-int(self.match_size):])*constants.WORD_WEIGHT
+                    char_weight = sum(self.prob_buffer[-int(self.match_size):])
 
-                    if char_weight > word_weight:
+                    if char_weight > word_weight or cp == 'x':
                         if self.curr_letter != cp:
                             self.add_letter(cp) 
 

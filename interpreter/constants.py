@@ -15,6 +15,7 @@ MIN_TRACKING_CONFIDENCE = .6
 
 # sequence model parameters
 SEQUENCE_INPUT_SIZE = 5 # nubmer of frames
+WORD_WEIGHT = .7
 
 import os
 try:
