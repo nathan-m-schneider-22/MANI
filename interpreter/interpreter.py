@@ -139,7 +139,7 @@ class Interpreter:
                 print(time.time() - lt)
 
                 # making sequence prediction
-                if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
+                if not constants.RPI_DETECTED and len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
 
 
                     seq_features = np.array(self.feature_buffer)
@@ -331,12 +331,17 @@ class Interpreter:
             t1 = Thread(target=self.display_frame_wait_thread, args=(lambda : stop_threads, ))
             t1.start()
 
-        while not self.is_hand_in_frame(frame):
-            frame = streamer.frame
-            if not constants.THREADING:
-                self.display_single_frame(frame, predict=False)
-            if constants.RPI_DETECTED:
-                turn_towards_pose(frame)
+        if constants.RPI_DETECTED:
+            while not turn_towards_pose(frame):
+                frame = streamer.frame
+                if not constants.THREADING:
+                    self.display_single_frame(frame, predict=False)
+
+        else:
+            while not self.is_hand_in_frame(frame):
+                frame = streamer.frame
+                if not constants.THREADING:
+                    self.display_single_frame(frame, predict=False)
 
         if constants.THREADING:
             stop_threads = True

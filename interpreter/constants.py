@@ -6,7 +6,7 @@ MIN_BUFFER_SIZE = 3
 TIME_LOOKBACK = 10
 
 # display thread
-THREADING = 0
+THREADING = 1
 
 # mediapipe hyperparameters
 MODEL_COMPLEXITY = 0

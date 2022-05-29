@@ -7,14 +7,13 @@ import interpreter.constants as constants
 if constants.RPI_DETECTED:
     from picamera2 import Picamera2
     picam2 = Picamera2()
-    picam2.configure(picam2.preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
+    picam2.configure(picam2.preview_configuration(main={"format": 'XRGB8888', "size": (1280, 720)}))
+    # picam2.configure(picam2.preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
+
     picam2.start()
 
 else:
     cap = cv2.VideoCapture(0)
-
-
-
 
 
 
@@ -61,7 +60,7 @@ class RPI_Camera:
 
 if __name__=="__main__":
 
-    cam = Camera()
+    cam = LaptopCamera()
     while True:
         frame = cam.capture_image()
         print("frame")
