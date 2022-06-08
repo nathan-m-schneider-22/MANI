@@ -19,8 +19,8 @@ pwm = HardwarePWM(pwm_channel=1, hz=50)
 pwm.start(100) # full duty cycle
 SLEEP_TIME = .03
 MAX = 180
-current_duty = 5
-DUTY_MIN = 3
+current_duty = 10
+DUTY_MIN = 7
 DUTY_MAX = 11
     
 def get_hip_shoulder_dist(pose):
@@ -41,6 +41,8 @@ def turn_towards_pose(image):
 
     # for p in poses:
     #     print(get_hip_shoulder_dist(p))
+
+    print("current duty: ",current_duty)
 
     if poses:
 
@@ -65,17 +67,16 @@ def turn_towards_pose(image):
 
                 current_duty = min(current_duty + SPEED, DUTY_MAX)
                 pwm.change_duty_cycle(current_duty)
-
         
         hand_level = min(pose.keypoints[9].point.y,pose.keypoints[10].point.y)
         shoulder_level = min(pose.keypoints[5].point.y,pose.keypoints[6].point.y)
 
 
-        for label, keypoint in pose.keypoints.items():
-            print('  %-20s x=%-4d y=%-4d score=%.1f' %
-                (label.name, keypoint.point[0], keypoint.point[1], keypoint.score))
+        # for label, keypoint in pose.keypoints.items():
+        #     print('  %-20s x=%-4d y=%-4d score=%.1f' %
+        #         (label.name, keypoint.point[0], keypoint.point[1], keypoint.score))
 
-        print(hand_level,shoulder_level)
+        # print(hand_level,shoulder_level)
         if hand_level < shoulder_level:
             print("RAISING HAND")
             return True
