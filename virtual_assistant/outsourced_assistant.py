@@ -5,7 +5,7 @@ def call_outsourced_API(input_val):
     print("Calling RPI API")
     # requests.post('http://raspberrypi.local:5000')
     # print("GET DONE")
-    req = requests.post('http://localhost:6000/',
+    req = requests.post('http://raspberrypi.local:6000/',
                     json={'query': input_val})
 
     # return req.json()['response'], req.json()['html']
