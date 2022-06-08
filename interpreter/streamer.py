@@ -1,13 +1,19 @@
 import threading
 import cv2
-from .camera import Camera
+from .camera import RPI_Camera, LaptopCamera
+import interpreter.constants as constants
+
 from flask import Flask, Response
 
 outputFrame = None
 lock = threading.Lock()
 display_raw_frame = False
 frame = None
-camera = Camera()
+
+if constants.RPI_DETECTED:
+    camera = RPI_Camera()
+else:
+    camera = LaptopCamera()
 
 app = Flask(__name__)
 

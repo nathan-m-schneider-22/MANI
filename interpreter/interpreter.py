@@ -1,6 +1,5 @@
 # from turtle import update
 
-from .camera import Camera
 from statistics import median
 import math
 import cv2
@@ -18,15 +17,26 @@ from . import streamer
 from .new_model.preprocess.feature_extractor import extract_features
 from display.display import Display
 
+if constants.RPI_DETECTED:
+    from .pose_servo import turn_towards_pose
+
+
+lt = time.time()
+
+
 # Interpreter class to parse images into signs, and build signs
 class Interpreter:
     def __init__(self, display_instance: Display):
         self.display_instance = display_instance
         
-        checkpoint_path = "./interpreter/new_model/output/modelpy39.joblib"
+        # checkpoint_path = "./interpreter/new_model/output/modelpy39.joblib"
+        checkpoint_path = "./interpreter/new_model/output/model.joblib"
+
         self.model = load(checkpoint_path)
 
-        sequence_path = "./interpreter/new_model/output/sequence-model1.joblib"
+        # sequence_path = "./interpreter/new_model/output/sequence-model1.joblib"
+        sequence_path = "./interpreter/new_model/output/sequence-model.joblib"
+
         self.seq_model = load(sequence_path)
 
         # mediapipe model
@@ -68,8 +78,12 @@ class Interpreter:
 
     # Parses the current frame from ASL to a letter
     def parse_frame(self):
+        global lt
         frame = streamer.frame
         
+        print(time.time() - lt)
+        lt = time.time()
+
         char_signed = False
         word_signed = False
         
@@ -101,6 +115,7 @@ class Interpreter:
                 with self.hand_landmark_lock:
                     self.hand_landmarks = hand_landmarks
 
+
                 # editting frame
                 frame = self.frame_transform(frame)
 
@@ -112,6 +127,7 @@ class Interpreter:
                 cp = self.model.classes_[np.argmax(preds)]
                 cp_prob = np.max(preds)
 
+
                 # update prob buffer
                 self.prob_buffer.pop(0)
                 self.prob_buffer.append(cp_prob)
@@ -120,8 +136,12 @@ class Interpreter:
                 self.buffer.pop(0)
                 self.buffer.append(cp)
 
+                print(time.time() - lt)
+
                 # making sequence prediction
-                if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
+                if not constants.RPI_DETECTED and len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
+
+
                     seq_features = np.array(self.feature_buffer)
                     seq_features = np.reshape(seq_features, seq_features.size).reshape(1, -1)
                     seq_preds = self.seq_model.predict_proba(seq_features)
@@ -136,6 +156,8 @@ class Interpreter:
                     self.sequence_prob_buffer.pop(0)
                     self.sequence_prob_buffer.append(seq_cp_prob)
                 
+
+
                 # update feature buffer
                 if len(self.feature_buffer) == constants.SEQUENCE_INPUT_SIZE:
                     self.feature_buffer.pop(0)
@@ -153,15 +175,15 @@ class Interpreter:
                 if all(x == self.buffer[-1] for x in self.buffer[-self.match_size:]):
                     char_signed = True
 
-                if all(x == self.sequence_buffer[-1] for x in self.sequence_buffer[-int(self.match_size/2):]) \
+                if all(x == self.sequence_buffer[-1] for x in self.sequence_buffer[-int(self.match_size):]) \
                     and self.sequence_buffer[-1] in ["j", "z"]:
                     word_signed = True
 
                 if char_signed and word_signed:
-                    word_weight = sum(self.sequence_prob_buffer[-int(self.match_size/2):])
-                    char_weight = sum(self.prob_buffer[-int(self.match_size/2):])
+                    word_weight = sum(self.sequence_prob_buffer[-int(self.match_size):])*constants.WORD_WEIGHT
+                    char_weight = sum(self.prob_buffer[-int(self.match_size):])
 
-                    if char_weight > word_weight:
+                    if char_weight > word_weight or cp == 'x':
                         if self.curr_letter != cp:
                             self.add_letter(cp) 
 
@@ -177,6 +199,8 @@ class Interpreter:
                     if self.curr_letter != cp:
                         self.add_letter(cp)    
             
+            if not constants.THREADING:
+                self.display_single_frame(frame, predict=True)
 
             if results.multi_hand_landmarks == None:
                 self.hand_assigned = False
@@ -187,6 +211,8 @@ class Interpreter:
 
                 with self.hand_landmark_lock:
                     self.hand_landmarks = None
+
+
 
     # Add letter to input query and display it
     def add_letter(self, cp: str):
@@ -250,6 +276,14 @@ class Interpreter:
                     streamer.outputFrame = frame.copy()
             if stop():
                 break
+    
+    def display_single_frame(self, frame, predict=False):
+        if frame is not None:
+            if predict:
+                frame = self.frame_transform(frame)
+                frame = self.mp_hand_transform(frame)
+            with streamer.lock:
+                streamer.outputFrame = frame.copy()
 
     def mp_hand_transform(self, frame):
         with self.hand_landmark_lock:
@@ -291,16 +325,27 @@ class Interpreter:
         while frame is None:
             frame = streamer.frame
             time.sleep(.1)
-        
-        stop_threads = False
-        t1 = Thread(target=self.display_frame_wait_thread, args=(lambda : stop_threads, ))
-        t1.start()
 
-        while not self.is_hand_in_frame(frame):
-            frame = streamer.frame
+        if constants.THREADING:
+            stop_threads = False
+            t1 = Thread(target=self.display_frame_wait_thread, args=(lambda : stop_threads, ))
+            t1.start()
 
-        stop_threads = True
-        t1.join()       
+        if constants.RPI_DETECTED:
+            while not turn_towards_pose(frame):
+                frame = streamer.frame
+                if not constants.THREADING:
+                    self.display_single_frame(frame, predict=False)
+
+        else:
+            while not self.is_hand_in_frame(frame):
+                frame = streamer.frame
+                if not constants.THREADING:
+                    self.display_single_frame(frame, predict=False)
+
+        if constants.THREADING:
+            stop_threads = True
+            t1.join()       
 
     # Captures the full sign input from the user, utilizes more complicated FSM logic
     def capture_full_input(self):
@@ -309,14 +354,17 @@ class Interpreter:
         self.curr_input = ''
         self.input_finished = 0
         
-        stop_threads = False
-        t1 = Thread(target=self.display_frame_predict_thread, args=(lambda : stop_threads, ))
-        t1.start()
+        if constants.THREADING:
+            stop_threads = False
+            t1 = Thread(target=self.display_frame_predict_thread, args=(lambda : stop_threads, ))
+            t1.start()
+
         while not self.input_finished:
             self.parse_frame()
         
-        stop_threads = True
-        t1.join()
+        if constants.THREADING:
+            stop_threads = True
+            t1.join()
 
         return self.curr_input
 

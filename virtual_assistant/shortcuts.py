@@ -1,4 +1,5 @@
 import csv
+import re
 
 shortcuts = dict()
 with open('shortcuts.csv', newline='\n') as csvfile:
@@ -8,7 +9,10 @@ with open('shortcuts.csv', newline='\n') as csvfile:
 
 def check_shortcut(input):
     input = input.lower()
-    if input in shortcuts.keys():
-        return shortcuts[input]
+    for key in shortcuts.keys():
+        expression = re.fullmatch(key, input)
+        if expression != None: 
+            input = shortcuts[key].format(*expression.groups())
+            return input
     else:
         return None
